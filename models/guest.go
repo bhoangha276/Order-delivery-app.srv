@@ -1,0 +1,18 @@
+package models
+
+import (
+	"time"
+
+	"go.mongodb.org/mongo-driver/bson/primitive"
+)
+
+type Guest struct {
+	ID       primitive.ObjectID `bson:"_id" json:"id"`
+	Name     string             `bson:"name" json:"name"`
+	Gender   int                `json:"gender" bson:"gender"`
+	Birthday string             `bson:"birthday" json:"birthday"`
+	Phone    string             `bson:"phone" json:"phone"`
+
+	Created_at time.Time `bson:"created_at"`
+	Updated_at time.Time `bson:"updated_at"`
+}
