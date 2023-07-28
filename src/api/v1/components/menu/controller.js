@@ -22,14 +22,14 @@ const getAllMenus = async (req, res) => {
 
 // GET BY ID
 const getMenu = async (req, res) => {
-    const { menuID } = req.params
+    const id = req.params.menuID.trim()
 
-    const foundMenu = await MenuModel.findById(menuID)
+    const foundMenu = await MenuModel.findById(id)
 
-    if (foundMenu === null) {
+    if (!foundMenu) {
         return res.send({
             success: 0,
-            msg: 'not found!',
+            message: 'Not found menu!',
         })
     }
 
@@ -55,18 +55,21 @@ const createMenu = async (req, res) => {
 
 // UPDATE
 const updateMenu = async (req, res) => {
-    const { menuID } = req.params
+    const id = req.params.menuID.trim()
 
     const updateMenuData = req.body
 
     const updatedMenu = await MenuModel.findOneAndUpdate(
-        { _id: menuID },
+        { _id: id },
         updateMenuData,
         { new: true }
     )
 
     if (!updatedMenu) {
-        throw new Error('Not found menu')
+        return res.send({
+            success: 0,
+            message: 'Not found menu!',
+        })
     }
 
     res.send({
@@ -76,11 +79,18 @@ const updateMenu = async (req, res) => {
 
 // DELETE
 const deleteMenu = async (req, res) => {
-    const { menuID } = req.params
+    const id = req.params.menuID.trim()
 
-    await MenuModel.findOneAndDelete({
-        _id: menuID,
+    const deletedMenu = await MenuModel.findOneAndDelete({
+        _id: id,
     })
+
+    if (!deletedMenu) {
+        return res.send({
+            success: 0,
+            message: 'Not found menu!',
+        })
+    }
 
     res.send({
         success: 1,

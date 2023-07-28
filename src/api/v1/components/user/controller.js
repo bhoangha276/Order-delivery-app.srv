@@ -23,14 +23,14 @@ const getAllUsers = async (req, res) => {
 
 // GET BY ID
 const getUser = async (req, res) => {
-    const { userID } = req.params
+    const id = req.params.userID.trim()
 
-    const foundUser = await UserModel.findById(userID)
+    const foundUser = await UserModel.findById(id)
 
-    if (foundUser === null) {
+    if (!foundUser) {
         return res.send({
             success: 0,
-            msg: 'not found!',
+            message: 'Not found user!',
         })
     }
 
@@ -49,14 +49,14 @@ const createUser = async (req, res) => {
     if (checkBirthday === null) {
         return res.send({
             success: 0,
-            msg: 'wrong birthday!',
+            message: 'Wrong birthday!',
         })
     }
 
     if (checkPhone != 10 && checkPhone !== 11) {
         return res.send({
             success: 0,
-            msg: 'wrong phone number!',
+            message: 'Wrong phone number!',
         })
     }
 
@@ -72,7 +72,7 @@ const createUser = async (req, res) => {
 
 // UPDATE
 const updateUser = async (req, res) => {
-    const { userID } = req.params
+    const id = req.params.userID.trim()
 
     const updateUserData = req.body
     const checkPhone = updateUserData.phone.length
@@ -81,25 +81,28 @@ const updateUser = async (req, res) => {
     if (checkBirthday === null) {
         return res.send({
             success: 0,
-            msg: 'wrong birthday!',
+            message: 'Wrong birthday!',
         })
     }
 
     if (checkPhone != 10 && checkPhone !== 11) {
         return res.send({
             success: 0,
-            msg: 'wrong phone number!',
+            message: 'Wrong phone number!',
         })
     }
 
     const updatedUser = await UserModel.findOneAndUpdate(
-        { _id: userID },
+        { _id: id },
         updateUserData,
         { new: true }
     )
 
     if (!updatedUser) {
-        throw new Error('Not found user')
+        return res.send({
+            success: 0,
+            message: 'Not found user!',
+        })
     }
 
     res.send({
@@ -109,11 +112,18 @@ const updateUser = async (req, res) => {
 
 // DELETE
 const deleteUser = async (req, res) => {
-    const { userID } = req.params
+    const id = req.params.userID.trim()
 
-    await UserModel.findOneAndDelete({
-        _id: userID,
+    const deletedUser = await UserModel.findOneAndDelete({
+        _id: id,
     })
+
+    if (!deletedUser) {
+        return res.send({
+            success: 0,
+            message: 'Not found user!',
+        })
+    }
 
     res.send({
         success: 1,
