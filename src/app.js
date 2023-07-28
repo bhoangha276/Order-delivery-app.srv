@@ -8,6 +8,9 @@ const userRoute = require('./api/v1/components/user')
 const menuRoute = require('./api/v1/components/menu')
 const productRoute = require('./api/v1/components/product')
 const employeeRoute = require('./api/v1/components/employee')
+const orderRoute = require('./api/v1/components/order')
+const orderItemRoute = require('./api/v1/components/order-item')
+const InvoiceRoute = require('./api/v1/components/invoice')
 
 const api = process.env.API_URL
 const port = process.env.PORT
@@ -39,6 +42,9 @@ async function main() {
     app.use(`${api}/menu`, menuRoute)
     app.use(`${api}/product`, productRoute)
     app.use(`${api}/employee`, employeeRoute)
+    app.use(`${api}/order`, orderRoute)
+    app.use(`${api}/order-item`, orderItemRoute)
+    app.use(`${api}/invoice`, InvoiceRoute)
 }
 
 main()
