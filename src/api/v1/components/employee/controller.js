@@ -22,14 +22,14 @@ const getAllEmployees = async (req, res) => {
 
 // GET BY ID
 const getEmployee = async (req, res) => {
-    const { employeeID } = req.params
+    const id = req.params.employeeID.trim()
 
-    const foundEmployee = await EmployeeModel.findById(employeeID)
+    const foundEmployee = await EmployeeModel.findById(id)
 
-    if (foundEmployee === null) {
+    if (!foundEmployee) {
         return res.send({
             success: 0,
-            msg: 'not found!',
+            message: 'Not found employee!',
         })
     }
 
@@ -55,18 +55,21 @@ const createEmployee = async (req, res) => {
 
 // UPDATE
 const updateEmployee = async (req, res) => {
-    const { employeeID } = req.params
+    const id = req.params.employeeID.trim()
 
     const updateEmployeeData = req.body
 
     const updatedEmployee = await EmployeeModel.findOneAndUpdate(
-        { _id: employeeID },
+        { _id: id },
         updateEmployeeData,
         { new: true }
     )
 
     if (!updatedEmployee) {
-        throw new Error('Not found employee')
+        return res.send({
+            success: 0,
+            message: 'Not found employee!',
+        })
     }
 
     res.send({
@@ -76,11 +79,18 @@ const updateEmployee = async (req, res) => {
 
 // DELETE
 const deleteEmployee = async (req, res) => {
-    const { employeeID } = req.params
+    const id = req.params.employeeID.trim()
 
-    await EmployeeModel.findOneAndDelete({
-        _id: employeeID,
+    const deletedEmployee = await EmployeeModel.findOneAndDelete({
+        _id: id,
     })
+
+    if (!deletedEmployee) {
+        return res.send({
+            success: 0,
+            message: 'Not found employee!',
+        })
+    }
 
     res.send({
         success: 1,

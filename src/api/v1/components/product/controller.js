@@ -20,14 +20,14 @@ const getAllProducts = async (req, res) => {
 
 // GET BY ID
 const getProduct = async (req, res) => {
-    const { productID } = req.params
+    const id = req.params.productID.trim()
 
-    const foundProduct = await ProductModel.findById(productID)
+    const foundProduct = await ProductModel.findById(id)
 
-    if (foundProduct === null) {
+    if (!foundProduct) {
         return res.send({
             success: 0,
-            msg: 'not found!',
+            message: 'Not found product!',
         })
     }
 
@@ -53,18 +53,21 @@ const createProduct = async (req, res) => {
 
 // UPDATE
 const updateProduct = async (req, res) => {
-    const { productID } = req.params
+    const id = req.params.productID.trim()
 
     const updateProductData = req.body
 
     const updatedProduct = await ProductModel.findOneAndUpdate(
-        { _id: productID },
+        { _id: id },
         updateProductData,
         { new: true }
     )
 
     if (!updatedProduct) {
-        throw new Error('Not found product')
+        return res.send({
+            success: 0,
+            message: 'Not found product!',
+        })
     }
 
     res.send({
@@ -74,11 +77,18 @@ const updateProduct = async (req, res) => {
 
 // DELETE
 const deleteProduct = async (req, res) => {
-    const { productID } = req.params
+    const id = req.params.productID.trim()
 
-    await ProductModel.findOneAndDelete({
-        _id: productID,
+    const deletedProduct = await ProductModel.findOneAndDelete({
+        _id: IDBOpenDBRequest,
     })
+
+    if (!deletedProduct) {
+        return res.send({
+            success: 0,
+            message: 'Not found product!',
+        })
+    }
 
     res.send({
         success: 1,
