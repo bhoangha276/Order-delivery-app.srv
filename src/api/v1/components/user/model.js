@@ -8,8 +8,8 @@ const UserSchema = new mongoose.Schema(
         phone: {
             type: String,
             trim: true,
-            minLength: 10,
-            maxLength: 11,
+            minLength: [10, 'Wrong phone number!'],
+            maxLength: [11, 'Wrong phone number!'],
             required: true,
         },
         avatar: { type: String, trim: true },

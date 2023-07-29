@@ -11,6 +11,7 @@ const employeeRoute = require('./api/v1/components/employee')
 const orderRoute = require('./api/v1/components/order')
 const orderItemRoute = require('./api/v1/components/order-item')
 const InvoiceRoute = require('./api/v1/components/invoice')
+const TableRoute = require('./api/v1/components/table')
 
 const api = process.env.API_URL
 const port = process.env.PORT
@@ -45,6 +46,7 @@ async function main() {
     app.use(`${api}/order`, orderRoute)
     app.use(`${api}/order-item`, orderItemRoute)
     app.use(`${api}/invoice`, InvoiceRoute)
+    app.use(`${api}/table`, TableRoute)
 }
 
 main()

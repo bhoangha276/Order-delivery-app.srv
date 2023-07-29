@@ -1,3 +1,3 @@
-const OrderItemRouter = require('./routes')
+const OrderItemRouter = require('./router')
 
 module.exports = OrderItemRouter

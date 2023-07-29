@@ -1,3 +1,3 @@
-const MenuRouter = require('./routes')
+const MenuRouter = require('./router')
 
 module.exports = MenuRouter
