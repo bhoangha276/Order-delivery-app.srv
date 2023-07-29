@@ -1,3 +1,3 @@
-const TableRouter = require('./routes')
+const TableRouter = require('./router')
 
 module.exports = TableRouter
