@@ -4,6 +4,7 @@ const mongoose = require('mongoose')
 const cors = require('cors')
 const morgan = require('morgan')
 
+const authRoute = require('./api/v1/components/auth')
 const userRoute = require('./api/v1/components/user')
 const menuRoute = require('./api/v1/components/menu')
 const productRoute = require('./api/v1/components/product')
@@ -39,6 +40,7 @@ async function main() {
         res.send('API is working! => Go to the /doc for details')
     })
 
+    app.use(`${api}/account`, authRoute)
     app.use(`${api}/user`, userRoute)
     app.use(`${api}/menu`, menuRoute)
     app.use(`${api}/product`, productRoute)
