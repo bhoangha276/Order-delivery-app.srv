@@ -1,21 +1,14 @@
 const ProductModel = require('./model')
+const HttpError = require('../../utilities/httpError')
 
 // GET ALL
 const getAllProducts = async (req, res) => {
-    try {
-        const products = await ProductModel.find()
+    const products = await ProductModel.find()
 
-        res.send({
-            success: 1,
-            data: products,
-        })
-    } catch (err) {
-        res.status(400).send({
-            success: 0,
-            data: null,
-            message: err.message || 'Something went wrong',
-        })
-    }
+    res.send({
+        success: 1,
+        data: products,
+    })
 }
 
 // GET BY ID
@@ -25,10 +18,7 @@ const getProduct = async (req, res) => {
     const foundProduct = await ProductModel.findById(id)
 
     if (!foundProduct) {
-        return res.send({
-            success: 0,
-            message: 'Not found product!',
-        })
+        throw new HttpError('Not found product!', 404)
     }
 
     res.send({
@@ -64,10 +54,7 @@ const updateProduct = async (req, res) => {
     )
 
     if (!updatedProduct) {
-        return res.send({
-            success: 0,
-            message: 'Not found product!',
-        })
+        throw new HttpError('Not found product!', 404)
     }
 
     res.send({
@@ -84,10 +71,7 @@ const deleteProduct = async (req, res) => {
     })
 
     if (!deletedProduct) {
-        return res.send({
-            success: 0,
-            message: 'Not found product!',
-        })
+        throw new HttpError('Not found product!', 404)
     }
 
     res.send({

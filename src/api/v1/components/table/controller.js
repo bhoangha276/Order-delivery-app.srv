@@ -1,23 +1,16 @@
 const TableModel = require('./model')
+const HttpError = require('../../utilities/httpError')
 
 // GET ALL
 const getAllTables = async (req, res) => {
-    try {
-        const tables = await TableModel.find()
-        // .populate({ path: 'tableID', select: 'title' })
-        // .populate('createdBy', 'username');
+    const tables = await TableModel.find()
+    // .populate({ path: 'tableID', select: 'title' })
+    // .populate('createdBy', 'username');
 
-        res.send({
-            success: 1,
-            data: tables,
-        })
-    } catch (err) {
-        res.status(400).send({
-            success: 0,
-            data: null,
-            message: err.message || 'Something went wrong',
-        })
-    }
+    res.send({
+        success: 1,
+        data: tables,
+    })
 }
 
 // GET BY ID
@@ -27,10 +20,7 @@ const getTable = async (req, res) => {
     const foundTable = await TableModel.findById(id)
 
     if (!foundTable) {
-        return res.send({
-            success: 0,
-            message: 'Not found table!',
-        })
+        throw new HttpError('Not found user!', 404)
     }
 
     res.send({
@@ -66,10 +56,7 @@ const updateTable = async (req, res) => {
     )
 
     if (!updatedTable) {
-        return res.send({
-            success: 0,
-            message: 'Not found table!',
-        })
+        throw new HttpError('Not found table!', 404)
     }
 
     res.send({
@@ -86,10 +73,7 @@ const deleteTable = async (req, res) => {
     })
 
     if (!deletedTable) {
-        return res.send({
-            success: 0,
-            message: 'Not found table!',
-        })
+        throw new HttpError('Not found table!', 404)
     }
 
     res.send({
