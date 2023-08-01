@@ -1,23 +1,16 @@
 const EmployeeModel = require('./model')
+const HttpError = require('../../utilities/httpError')
 
 // GET ALL
 const getAllEmployees = async (req, res) => {
-    try {
-        const employees = await EmployeeModel.find()
-        // .populate({ path: 'employeeID', select: 'title' })
-        // .populate('createdBy', 'username');
+    const employees = await EmployeeModel.find()
+    // .populate({ path: 'employeeID', select: 'title' })
+    // .populate('createdBy', 'username');
 
-        res.send({
-            success: 1,
-            data: employees,
-        })
-    } catch (err) {
-        res.status(400).send({
-            success: 0,
-            data: null,
-            message: err.message || 'Something went wrong',
-        })
-    }
+    res.send({
+        success: 1,
+        data: employees,
+    })
 }
 
 // GET BY ID
@@ -27,10 +20,7 @@ const getEmployee = async (req, res) => {
     const foundEmployee = await EmployeeModel.findById(id)
 
     if (!foundEmployee) {
-        return res.send({
-            success: 0,
-            message: 'Not found employee!',
-        })
+        throw new HttpError('Not found employee!', 404)
     }
 
     res.send({
@@ -66,10 +56,7 @@ const updateEmployee = async (req, res) => {
     )
 
     if (!updatedEmployee) {
-        return res.send({
-            success: 0,
-            message: 'Not found employee!',
-        })
+        throw new HttpError('Not found employee!', 404)
     }
 
     res.send({
@@ -86,10 +73,7 @@ const deleteEmployee = async (req, res) => {
     })
 
     if (!deletedEmployee) {
-        return res.send({
-            success: 0,
-            message: 'Not found employee!',
-        })
+        throw new HttpError('Not found employee!', 404)
     }
 
     res.send({

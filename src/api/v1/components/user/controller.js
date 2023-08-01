@@ -1,24 +1,17 @@
 const UserModel = require('./model')
 const dateReg = /([12]\d{3}([-/.])(0[1-9]|1[0-2])([-/.])(0[1-9]|[12]\d|3[01]))$/
+const HttpError = require('../../utilities/httpError')
 
 // GET ALL
 const getAllUsers = async (req, res) => {
-    try {
-        const users = await UserModel.find()
-        // .populate({ path: 'userID', select: 'title' })
-        // .populate('createdBy', 'username');
+    const users = await UserModel.find()
+    // .populate({ path: 'userID', select: 'title' })
+    // .populate('createdBy', 'username');
 
-        res.send({
-            success: 1,
-            data: users,
-        })
-    } catch (err) {
-        res.status(400).send({
-            success: 0,
-            data: null,
-            message: err.message || 'Something went wrong',
-        })
-    }
+    res.send({
+        success: 1,
+        data: users,
+    })
 }
 
 // GET BY ID
@@ -28,10 +21,7 @@ const getUser = async (req, res) => {
     const foundUser = await UserModel.findById(id)
 
     if (!foundUser) {
-        return res.send({
-            success: 0,
-            message: 'Not found user!',
-        })
+        throw new HttpError('Not found user!', 404)
     }
 
     res.send({
@@ -47,17 +37,11 @@ const createUser = async (req, res) => {
     const checkBirthday = newUserData.birthday.match(dateReg)
 
     if (checkBirthday === null) {
-        return res.send({
-            success: 0,
-            message: 'Wrong birthday!',
-        })
+        throw new HttpError('Wrong birthday!')
     }
 
     if (checkPhone != 10 && checkPhone !== 11) {
-        return res.send({
-            success: 0,
-            message: 'Wrong phone number!',
-        })
+        throw new HttpError('Wrong phone number!')
     }
 
     const updatedUser = await UserModel.create({
@@ -79,17 +63,11 @@ const updateUser = async (req, res) => {
     const checkBirthday = updateUserData.birthday.match(dateReg)
 
     if (checkBirthday === null) {
-        return res.send({
-            success: 0,
-            message: 'Wrong birthday!',
-        })
+        throw new HttpError('Wrong birthday!')
     }
 
     if (checkPhone != 10 && checkPhone !== 11) {
-        return res.send({
-            success: 0,
-            message: 'Wrong phone number!',
-        })
+        throw new HttpError('Wrong phone number!')
     }
 
     const updatedUser = await UserModel.findOneAndUpdate(
@@ -99,10 +77,7 @@ const updateUser = async (req, res) => {
     )
 
     if (!updatedUser) {
-        return res.send({
-            success: 0,
-            message: 'Not found user!',
-        })
+        throw new HttpError('Not found user!', 404)
     }
 
     res.send({
@@ -119,10 +94,7 @@ const deleteUser = async (req, res) => {
     })
 
     if (!deletedUser) {
-        return res.send({
-            success: 0,
-            message: 'Not found user!',
-        })
+        throw new HttpError('Not found user!', 404)
     }
 
     res.send({

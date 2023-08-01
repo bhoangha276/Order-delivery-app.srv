@@ -1,23 +1,16 @@
 const InvoiceModel = require('./model')
+const HttpError = require('../../utilities/httpError')
 
 // GET ALL
 const getAllInvoices = async (req, res) => {
-    try {
-        const invoices = await InvoiceModel.find()
-        // .populate({ path: 'invoiceID', select: 'title' })
-        // .populate('createdBy', 'username');
+    const invoices = await InvoiceModel.find()
+    // .populate({ path: 'invoiceID', select: 'title' })
+    // .populate('createdBy', 'username');
 
-        res.send({
-            success: 1,
-            data: invoices,
-        })
-    } catch (err) {
-        res.status(400).send({
-            success: 0,
-            data: null,
-            message: err.message || 'Something went wrong',
-        })
-    }
+    res.send({
+        success: 1,
+        data: invoices,
+    })
 }
 
 // GET BY ID
@@ -27,10 +20,7 @@ const getInvoice = async (req, res) => {
     const foundInvoice = await InvoiceModel.findById(id)
 
     if (!foundInvoice) {
-        return res.send({
-            success: 0,
-            message: 'Not found invoice!',
-        })
+        throw new HttpError('Not found invoice!', 404)
     }
 
     res.send({
@@ -66,10 +56,7 @@ const updateInvoice = async (req, res) => {
     )
 
     if (!updatedInvoice) {
-        return res.send({
-            success: 0,
-            message: 'Not found invoice!',
-        })
+        throw new HttpError('Not found invoice!', 404)
     }
 
     res.send({
@@ -86,10 +73,7 @@ const deleteInvoice = async (req, res) => {
     })
 
     if (!deletedInvoice) {
-        return res.send({
-            success: 0,
-            message: 'Not found invoice!',
-        })
+        throw new HttpError('Not found invoice!', 404)
     }
 
     res.send({

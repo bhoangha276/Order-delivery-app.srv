@@ -1,23 +1,16 @@
 const OrderModel = require('./model')
+const HttpError = require('../../utilities/httpError')
 
 // GET ALL
 const getAllOrders = async (req, res) => {
-    try {
-        const orders = await OrderModel.find()
-        // .populate({ path: 'orderID', select: 'title' })
-        // .populate('createdBy', 'username');
+    const orders = await OrderModel.find()
+    // .populate({ path: 'orderID', select: 'title' })
+    // .populate('createdBy', 'username');
 
-        res.send({
-            success: 1,
-            data: orders,
-        })
-    } catch (err) {
-        res.status(400).send({
-            success: 0,
-            data: null,
-            message: err.message || 'Something went wrong',
-        })
-    }
+    res.send({
+        success: 1,
+        data: orders,
+    })
 }
 
 // GET BY ID
@@ -27,10 +20,7 @@ const getOrder = async (req, res) => {
     const foundOrder = await OrderModel.findById(id)
 
     if (!foundOrder) {
-        return res.send({
-            success: 0,
-            message: 'Not found order!',
-        })
+        throw new HttpError('Not found order!', 404)
     }
 
     res.send({
@@ -66,10 +56,7 @@ const updateOrder = async (req, res) => {
     )
 
     if (!updatedOrder) {
-        return res.send({
-            success: 0,
-            message: 'Not found order!',
-        })
+        throw new HttpError('Not found order!', 404)
     }
 
     res.send({
@@ -86,10 +73,7 @@ const deleteOrder = async (req, res) => {
     })
 
     if (!deletedOrder) {
-        return res.send({
-            success: 0,
-            message: 'Not found order!',
-        })
+        throw new HttpError('Not found order!', 404)
     }
 
     res.send({

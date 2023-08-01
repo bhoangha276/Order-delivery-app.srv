@@ -1,23 +1,16 @@
 const MenuModel = require('./model')
+const HttpError = require('../../utilities/httpError')
 
 // GET ALL
 const getAllMenus = async (req, res) => {
-    try {
-        const menus = await MenuModel.find()
-        // .populate({ path: 'menuID', select: 'title' })
-        // .populate('createdBy', 'username');
+    const menus = await MenuModel.find()
+    // .populate({ path: 'menuID', select: 'title' })
+    // .populate('createdBy', 'username');
 
-        res.send({
-            success: 1,
-            data: menus,
-        })
-    } catch (err) {
-        res.status(400).send({
-            success: 0,
-            data: null,
-            message: err.message || 'Something went wrong',
-        })
-    }
+    res.send({
+        success: 1,
+        data: menus,
+    })
 }
 
 // GET BY ID
@@ -27,10 +20,7 @@ const getMenu = async (req, res) => {
     const foundMenu = await MenuModel.findById(id)
 
     if (!foundMenu) {
-        return res.send({
-            success: 0,
-            message: 'Not found menu!',
-        })
+        throw new HttpError('Not found menu!', 404)
     }
 
     res.send({
@@ -66,10 +56,7 @@ const updateMenu = async (req, res) => {
     )
 
     if (!updatedMenu) {
-        return res.send({
-            success: 0,
-            message: 'Not found menu!',
-        })
+        throw new HttpError('Not found menu!', 404)
     }
 
     res.send({
@@ -86,10 +73,7 @@ const deleteMenu = async (req, res) => {
     })
 
     if (!deletedMenu) {
-        return res.send({
-            success: 0,
-            message: 'Not found menu!',
-        })
+        throw new HttpError('Not found menu!', 404)
     }
 
     res.send({

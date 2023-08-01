@@ -1,5 +1,6 @@
 require('dotenv').config()
 const express = require('express')
+require('express-async-errors')
 const mongoose = require('mongoose')
 const cors = require('cors')
 const morgan = require('morgan')
@@ -13,6 +14,8 @@ const orderRoute = require('./api/v1/components/order')
 const orderItemRoute = require('./api/v1/components/order-item')
 const InvoiceRoute = require('./api/v1/components/invoice')
 const TableRoute = require('./api/v1/components/table')
+
+const errorHandler = require('./api/v1/utilities/errorHandler')
 
 const api = process.env.API_URL
 const port = process.env.PORT
@@ -29,13 +32,6 @@ async function main() {
     app.use(express.json())
     app.use(morgan('tiny'))
 
-    app.listen(port || 8000, (err) => {
-        if (err) throw err
-        console.log(
-            `Order-delivery-management server is running http://localhost:${port}`
-        )
-    })
-
     app.get('/', (req, res) => {
         res.send('API is working! => Go to the /doc for details')
     })
@@ -49,6 +45,15 @@ async function main() {
     app.use(`${api}/order-item`, orderItemRoute)
     app.use(`${api}/invoice`, InvoiceRoute)
     app.use(`${api}/table`, TableRoute)
+
+    app.use(errorHandler)
+
+    app.listen(port || 8000, (err) => {
+        if (err) throw err
+        console.log(
+            `Order-delivery-management server is running http://localhost:${port}`
+        )
+    })
 }
 
 main()
