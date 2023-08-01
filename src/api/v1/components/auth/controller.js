@@ -1,7 +1,7 @@
 const bcrypt = require('bcryptjs')
 const AccountModel = require('./account')
-const tokenProvider = require('../../middleware/tokenProvider')
-const HttpError = require('../../middleware/httpError')
+const tokenProvider = require('../../utilities/tokenProvider')
+const HttpError = require('../../utilities/httpError')
 
 const signUp = async (req, res, next) => {
     try {
