@@ -1,5 +1,37 @@
+const bcrypt = require('bcryptjs')
 const EmployeeModel = require('./model')
+const tokenProvider = require('../../utilities/tokenProvider')
 const HttpError = require('../../utilities/httpError')
+
+//LOGIN MANAGE
+const manage = async (req, res) => {
+    const { code, password } = req.body
+    const existedEmployee = await EmployeeModel.findOne({ code })
+
+    if (!existedEmployee) {
+        throw new HttpError('Login failed!.', 400)
+    }
+
+    const hastPassword = existedEmployee.password
+    const matchedPassword = await bcrypt.compare(password, hastPassword)
+
+    if (!matchedPassword) {
+        throw new HttpError('Login failed!', 400)
+    }
+
+    const token = tokenProvider.sign(existedEmployee._id)
+
+    res.send({
+        success: 1,
+        data: {
+            _id: existedEmployee._id,
+            name: existedEmployee.name,
+            role: existedEmployee.role,
+            code: existedEmployee.code,
+            token: token,
+        },
+    })
+}
 
 // GET ALL
 const getAllEmployees = async (req, res) => {
@@ -31,10 +63,15 @@ const getEmployee = async (req, res) => {
 
 // CREATE
 const createEmployee = async (req, res) => {
-    const newEmployeeData = req.body
+    const { name, role, code, password } = req.body
+
+    const hashPassword = await bcrypt.hash(password, 10)
+
+    const newEmployeeData = { name, role, code }
 
     const updatedEmployee = await EmployeeModel.create({
         ...newEmployeeData,
+        password: hashPassword,
     })
 
     res.send({
@@ -47,7 +84,16 @@ const createEmployee = async (req, res) => {
 const updateEmployee = async (req, res) => {
     const id = req.params.employeeID.trim()
 
-    const updateEmployeeData = req.body
+    const { name, role, code, password } = req.body
+
+    const hashPassword = await bcrypt.hash(password, 10)
+
+    const updateEmployeeData = {
+        name: name,
+        role: role,
+        code: code,
+        password: hashPassword,
+    }
 
     const updatedEmployee = await EmployeeModel.findOneAndUpdate(
         { _id: id },
@@ -82,6 +128,7 @@ const deleteEmployee = async (req, res) => {
 }
 
 module.exports = {
+    manage,
     getAllEmployees,
     getEmployee,
     createEmployee,
