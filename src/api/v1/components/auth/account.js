@@ -2,14 +2,23 @@ const mongoose = require('mongoose')
 
 const AccountSchema = mongoose.Schema(
     {
+        employeeID: {
+            type: mongoose.Types.ObjectId,
+            ref: 'Employee',
+            default: undefined,
+        },
         userID: {
             type: mongoose.Types.ObjectId,
             ref: 'User',
-            // required: true,
+            default: undefined,
         },
         email: { type: String, require: true },
         password: { type: String, require: true },
-        role: { type: String, default: 'user' },
+        role: {
+            type: String,
+            enum: ['admin', 'employee', 'user'],
+            default: 'user',
+        },
         token: { type: String },
         refreshToken: { type: String },
         emailVerified: { type: Boolean, default: 0 },

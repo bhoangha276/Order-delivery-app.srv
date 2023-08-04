@@ -15,8 +15,10 @@ const OrderSchema = new mongoose.Schema(
         tableID: {
             type: mongoose.Types.ObjectId,
             ref: 'Table',
+            default: null,
         },
         orderCode: { type: Number },
+        address: { type: String, trim: true, default: '' },
         dateTime: { type: Date },
         status: { type: Boolean, default: 1 },
     },

@@ -1,43 +1,11 @@
-const bcrypt = require('bcryptjs')
 const EmployeeModel = require('./model')
-const tokenProvider = require('../../utilities/tokenProvider')
 const HttpError = require('../../utilities/httpError')
 
-//LOGIN MANAGE
-const manage = async (req, res) => {
-    const { code, password } = req.body
-    const existedEmployee = await EmployeeModel.findOne({ code })
-
-    if (!existedEmployee) {
-        throw new HttpError('Login failed!.', 400)
-    }
-
-    const hastPassword = existedEmployee.password
-    const matchedPassword = await bcrypt.compare(password, hastPassword)
-
-    if (!matchedPassword) {
-        throw new HttpError('Login failed!', 400)
-    }
-
-    const token = tokenProvider.sign(existedEmployee._id)
-
-    res.send({
-        success: 1,
-        data: {
-            _id: existedEmployee._id,
-            name: existedEmployee.name,
-            role: existedEmployee.role,
-            code: existedEmployee.code,
-            token: token,
-        },
-    })
-}
+const dateReg = /([12]\d{3}([-/.])(0[1-9]|1[0-2])([-/.])(0[1-9]|[12]\d|3[01]))$/
 
 // GET ALL
 const getAllEmployees = async (req, res) => {
     const employees = await EmployeeModel.find()
-    // .populate({ path: 'employeeID', select: 'title' })
-    // .populate('createdBy', 'username');
 
     res.send({
         success: 1,
@@ -63,15 +31,20 @@ const getEmployee = async (req, res) => {
 
 // CREATE
 const createEmployee = async (req, res) => {
-    const { name, role, code, password } = req.body
+    const newEmployeeData = req.body
+    const checkPhone = newEmployeeData.phone.length
+    const checkBirthday = newEmployeeData.birthday.match(dateReg)
 
-    const hashPassword = await bcrypt.hash(password, 10)
+    if (checkBirthday === null) {
+        throw new HttpError('Wrong birthday!')
+    }
 
-    const newEmployeeData = { name, role, code }
+    if (checkPhone != 10 && checkPhone !== 11) {
+        throw new HttpError('Wrong phone number!')
+    }
 
     const updatedEmployee = await EmployeeModel.create({
         ...newEmployeeData,
-        password: hashPassword,
     })
 
     res.send({
@@ -84,15 +57,16 @@ const createEmployee = async (req, res) => {
 const updateEmployee = async (req, res) => {
     const id = req.params.employeeID.trim()
 
-    const { name, role, code, password } = req.body
+    const updateEmployeeData = req.body
+    const checkPhone = updateEmployeeData.phone.length
+    const checkBirthday = updateEmployeeData.birthday.match(dateReg)
 
-    const hashPassword = await bcrypt.hash(password, 10)
+    if (checkBirthday === null) {
+        throw new HttpError('Wrong birthday!')
+    }
 
-    const updateEmployeeData = {
-        name: name,
-        role: role,
-        code: code,
-        password: hashPassword,
+    if (checkPhone != 10 && checkPhone !== 11) {
+        throw new HttpError('Wrong phone number!')
     }
 
     const updatedEmployee = await EmployeeModel.findOneAndUpdate(
@@ -128,7 +102,6 @@ const deleteEmployee = async (req, res) => {
 }
 
 module.exports = {
-    manage,
     getAllEmployees,
     getEmployee,
     createEmployee,
