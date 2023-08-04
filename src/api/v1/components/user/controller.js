@@ -1,7 +1,7 @@
 const UserModel = require('./model')
-const dateReg = /([12]\d{3}([-/.])(0[1-9]|1[0-2])([-/.])(0[1-9]|[12]\d|3[01]))$/
 const HttpError = require('../../utilities/httpError')
 
+const dateReg = /([12]\d{3}([-/.])(0[1-9]|1[0-2])([-/.])(0[1-9]|[12]\d|3[01]))$/
 // GET ALL
 const getAllUsers = async (req, res) => {
     const users = await UserModel.find()

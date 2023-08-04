@@ -1,7 +1,6 @@
 const router = require('express').Router()
 const employeeController = require('./controller')
 
-router.post('/manage', employeeController.manage)
 router.get('/', employeeController.getAllEmployees)
 router.get('/:employeeID', employeeController.getEmployee)
 router.post(

@@ -2,8 +2,9 @@ const mongoose = require('mongoose')
 
 const UserSchema = new mongoose.Schema(
     {
-        name: { type: String, trim: true, reqiured: true },
-        gender: { type: String, trim: true },
+        name: { type: String, trim: true, required: true },
+        address: { type: Array, default: [] },
+        gender: { type: String, enum: ['male', 'female'], trim: true },
         birthday: { type: Date },
         phone: {
             type: String,
@@ -12,7 +13,7 @@ const UserSchema = new mongoose.Schema(
             maxLength: [11, 'Wrong phone number!'],
             required: true,
         },
-        avatar: { type: String, trim: true },
+        photo: { type: String, trim: true },
     },
     { timestamps: true }
 )
