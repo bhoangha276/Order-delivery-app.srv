@@ -3,6 +3,85 @@ const AccountModel = require('./account')
 const tokenProvider = require('../../utilities/tokenProvider')
 const HttpError = require('../../utilities/httpError')
 
+// GET ALL
+const getAllAccounts = async (req, res) => {
+    const accounts = await AccountModel.find()
+
+    res.send({
+        success: 1,
+        data: accounts,
+    })
+}
+
+// GET BY ID
+const getAccount = async (req, res) => {
+    const id = req.params.accountID.trim()
+
+    const foundAccount = await AccountModel.findById(id)
+
+    if (!foundAccount) {
+        throw new HttpError('Not found account!', 404)
+    }
+
+    res.send({
+        success: 1,
+        data: foundAccount,
+    })
+}
+
+// CREATE
+const createAccount = async (req, res) => {
+    const newAccountData = req.body
+
+    const updatedAccount = await AccountModel.create({
+        ...newAccountData,
+    })
+
+    res.send({
+        success: 1,
+        id: updatedAccount._id,
+    })
+}
+
+// UPDATE
+const updateAccount = async (req, res) => {
+    const id = req.params.accountID.trim()
+
+    const updateAccountData = req.body
+
+    const updatedAccount = await AccountModel.findOneAndUpdate(
+        { _id: id },
+        updateAccountData,
+        { new: true }
+    )
+
+    if (!updatedAccount) {
+        throw new HttpError('Not found account!', 404)
+    }
+
+    res.send({
+        success: 1,
+    })
+}
+
+// DELETE
+const deleteAccount = async (req, res) => {
+    const id = req.params.accountID.trim()
+
+    const deletedAccount = await AccountModel.findOneAndDelete({
+        _id: id,
+    })
+
+    if (!deletedAccount) {
+        throw new HttpError('Not found account!', 404)
+    }
+
+    res.send({
+        success: 1,
+    })
+}
+
+//SIGN UP
 const signUp = async (req, res, next) => {
     const { email, password } = req.body
 
@@ -27,7 +106,7 @@ const signUp = async (req, res, next) => {
         password: hashPassword,
     })
 
-    const token = tokenProvider.sign(newAccount._id)
+    const token = tokenProvider.sign(newAccount._id, newAccount.role)
 
     res.send({
         success: 1,
@@ -42,6 +121,7 @@ const signUp = async (req, res, next) => {
     })
 }
 
+// LOGIN
 const login = async (req, res) => {
     const { email, password } = req.body
     const existedAccount = await AccountModel.findOne({ email })
@@ -57,7 +137,7 @@ const login = async (req, res) => {
         throw new HttpError('Login failed!', 400)
     }
 
-    const token = tokenProvider.sign(existedAccount._id)
+    const token = tokenProvider.sign(existedAccount._id, existedAccount.role)
 
     res.send({
         success: 1,
@@ -85,6 +165,11 @@ const getAccountInfo = async (req, res) => {
 }
 
 module.exports = {
+    getAllAccounts,
+    getAccount,
+    createAccount,
+    updateAccount,
+    deleteAccount,
     signUp,
     login,
     getAccountInfo,

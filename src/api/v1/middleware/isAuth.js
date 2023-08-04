@@ -1,26 +1,32 @@
-const tokenProvider = require('../tokenProvider')
-const UserModel = require('../../modules/auth/user')
-const HttpError = require('../httpError')
+const tokenProvider = require('../utilities/tokenProvider')
+const AccountModel = require('../components/auth/account')
+const HttpError = require('../utilities/httpError')
 
 const isAuth = async (req, res, next) => {
     const token = req.headers.authorization
 
     if (!token) {
-        throw new HttpError('Not have token', 401)
+        throw new HttpError('Not have token!', 401)
     }
     const identityData = tokenProvider.verify(token)
 
-    if (!identityData.userId) {
-        throw new HttpError('Invalid token', 401)
+    if (!identityData.id) {
+        throw new HttpError('Invalid token!', 401)
     }
 
-    const existedUser = await UserModel.findById(identityData.userId)
+    const existedAccount = await AccountModel.findById(identityData.id)
 
-    if (!existedUser) {
-        throw new HttpError('Not found user', 401)
+    if (!existedAccount) {
+        throw new HttpError('Not found account!', 401)
     }
 
-    req.user = existedUser
+    const isAdmin = existedAccount.role
+
+    if (!isAdmin || isAdmin != 'admin') {
+        throw new HttpError('Permission denied!', 401)
+    }
+
+    req.account = existedAccount
     next()
 }
 

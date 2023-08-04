@@ -36,7 +36,7 @@ async function main() {
         res.send('API is working! => Go to the /doc for details')
     })
 
-    app.use(`${api}/account`, authRoute)
+    app.use(`${api}/auth`, authRoute)
     app.use(`${api}/user`, userRoute)
     app.use(`${api}/menu`, menuRoute)
     app.use(`${api}/product`, productRoute)
