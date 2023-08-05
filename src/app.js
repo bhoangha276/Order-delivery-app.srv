@@ -3,7 +3,6 @@ const express = require('express')
 require('express-async-errors')
 const mongoose = require('mongoose')
 const cors = require('cors')
-const morgan = require('morgan')
 
 const authRoute = require('./api/v1/components/auth')
 const userRoute = require('./api/v1/components/user')
@@ -16,6 +15,7 @@ const InvoiceRoute = require('./api/v1/components/invoice')
 const TableRoute = require('./api/v1/components/table')
 
 const errorHandler = require('./api/v1/utilities/errorHandler')
+const log = require('./api/v1/middlewares/log')
 
 const api = process.env.API_URL
 const port = process.env.PORT
@@ -30,7 +30,7 @@ async function main() {
     const app = express()
     app.use(cors())
     app.use(express.json())
-    app.use(morgan('tiny'))
+    app.use(log)
 
     app.get('/', (req, res) => {
         res.send('API is working! => Go to the /doc for details')
