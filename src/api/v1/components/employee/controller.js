@@ -1,8 +1,6 @@
 const EmployeeModel = require('./model')
 const HttpError = require('../../utilities/httpError')
 
-const dateReg = /([12]\d{3}([-/.])(0[1-9]|1[0-2])([-/.])(0[1-9]|[12]\d|3[01]))$/
-
 // FILTER
 const filterEmployee = async (req, res) => {
     const { keyword } = req.query
@@ -91,16 +89,6 @@ const getEmployee = async (req, res) => {
 // CREATE
 const createEmployee = async (req, res) => {
     const newEmployeeData = req.body
-    const checkPhone = newEmployeeData.phone.length
-    const checkBirthday = newEmployeeData.birthday.match(dateReg)
-
-    if (checkBirthday === null) {
-        throw new HttpError('Wrong birthday!')
-    }
-
-    if (checkPhone != 10 && checkPhone !== 11) {
-        throw new HttpError('Wrong phone number!')
-    }
 
     const updatedEmployee = await EmployeeModel.create({
         ...newEmployeeData,
@@ -117,16 +105,6 @@ const updateEmployee = async (req, res) => {
     const id = req.params.employeeID.trim()
 
     const updateEmployeeData = req.body
-    const checkPhone = updateEmployeeData.phone.length
-    const checkBirthday = updateEmployeeData.birthday.match(dateReg)
-
-    if (checkBirthday === null) {
-        throw new HttpError('Wrong birthday!')
-    }
-
-    if (checkPhone != 10 && checkPhone !== 11) {
-        throw new HttpError('Wrong phone number!')
-    }
 
     const updatedEmployee = await EmployeeModel.findOneAndUpdate(
         { _id: id },

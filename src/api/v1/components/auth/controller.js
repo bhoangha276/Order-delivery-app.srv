@@ -142,14 +142,6 @@ const deleteAccount = async (req, res) => {
 const signUp = async (req, res, next) => {
     const { email, password } = req.body
 
-    if (!email) {
-        throw new HttpError('Email field is not empty!', 422)
-    }
-
-    if (!password && password.length < 5) {
-        throw new HttpError('Password 5 characters or longer!', 422)
-    }
-
     const existedAccount = await AccountModel.findOne({ email })
     if (existedAccount) {
         throw new HttpError('This email address is already used!', 400)
