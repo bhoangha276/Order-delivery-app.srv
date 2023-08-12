@@ -1,8 +1,6 @@
 const UserModel = require('./model')
 const HttpError = require('../../utilities/httpError')
 
-const dateReg = /([12]\d{3}([-/.])(0[1-9]|1[0-2])([-/.])(0[1-9]|[12]\d|3[01]))$/
-
 // FILTER
 const filterUser = async (req, res) => {
     const { keyword } = req.query
@@ -91,16 +89,6 @@ const getUser = async (req, res) => {
 // CREATE
 const createUser = async (req, res) => {
     const newUserData = req.body
-    const checkPhone = newUserData.phone.length
-    const checkBirthday = newUserData.birthday.match(dateReg)
-
-    if (checkBirthday === null) {
-        throw new HttpError('Wrong birthday!')
-    }
-
-    if (checkPhone != 10 && checkPhone !== 11) {
-        throw new HttpError('Wrong phone number!')
-    }
 
     const updatedUser = await UserModel.create({
         ...newUserData,
@@ -117,16 +105,6 @@ const updateUser = async (req, res) => {
     const id = req.params.userID.trim()
 
     const updateUserData = req.body
-    const checkPhone = updateUserData.phone.length
-    const checkBirthday = updateUserData.birthday.match(dateReg)
-
-    if (checkBirthday === null) {
-        throw new HttpError('Wrong birthday!')
-    }
-
-    if (checkPhone != 10 && checkPhone !== 11) {
-        throw new HttpError('Wrong phone number!')
-    }
 
     const updatedUser = await UserModel.findOneAndUpdate(
         { _id: id },
