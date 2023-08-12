@@ -1,15 +1,71 @@
 const TableModel = require('./model')
 const HttpError = require('../../utilities/httpError')
 
-// GET ALL
-const getAllTables = async (req, res) => {
-    const tables = await TableModel.find()
-    // .populate({ path: 'tableID', select: 'title' })
-    // .populate('createdBy', 'username');
+// FILTER
+const filterTable = async (req, res) => {
+    const { keyword } = req.query
+    const filter = keyword
+        ? {
+              $or: [
+                  //   { number: { $regex: new RegExp(`${keyword}`, 'i') } },
+                  //   { capacity: { $regex: new RegExp(`${keyword}`, 'i') } },
+                  //   { status: { $regex: new RegExp(`${keyword}`, 'i') } },
+              ],
+          }
+        : {}
+
+    const filters = {
+        ...filter,
+    }
+
+    const [tables, total] = await Promise.all([
+        TableModel.find(filters),
+        TableModel.find(filters).countDocuments(),
+    ])
 
     res.send({
         success: 1,
         data: tables,
+        Total: total,
+    })
+}
+
+// GET ALL
+const getAllTables = async (req, res) => {
+    const { page, limit, sortDirection, sortField } = req.query
+
+    const pagination = {
+        page: page > 0 ? Number(page) : 1,
+        limit: limit > 0 ? Number(limit) : 2,
+    }
+    pagination.skip = (pagination.page - 1) * pagination.limit
+
+    const sortDirectionParams = sortDirection ? Number(sortDirection) : -1
+    const sortFieldParams = sortField
+        ? {
+              [sortField]: sortDirectionParams,
+          }
+        : { createdAt: sortDirectionParams }
+
+    const [tables, total] = await Promise.all([
+        TableModel.find()
+            .sort(sortFieldParams)
+            .skip(pagination.skip)
+            .limit(pagination.limit),
+        TableModel.find().countDocuments(),
+    ])
+
+    let totalPage = Math.ceil(total / pagination.limit)
+
+    res.send({
+        success: 1,
+        data: tables,
+        Paging: {
+            CurrentPage: pagination.page,
+            Limit: pagination.limit,
+            TotalPage: totalPage,
+            Total: total,
+        },
     })
 }
 
@@ -20,7 +76,7 @@ const getTable = async (req, res) => {
     const foundTable = await TableModel.findById(id)
 
     if (!foundTable) {
-        throw new HttpError('Not found user!', 404)
+        throw new HttpError('Not found table!', 404)
     }
 
     res.send({
@@ -82,6 +138,7 @@ const deleteTable = async (req, res) => {
 }
 
 module.exports = {
+    filterTable,
     getAllTables,
     getTable,
     createTable,

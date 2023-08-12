@@ -1,15 +1,67 @@
 const InvoiceModel = require('./model')
 const HttpError = require('../../utilities/httpError')
 
-// GET ALL
-const getAllInvoices = async (req, res) => {
-    const invoices = await InvoiceModel.find()
-    // .populate({ path: 'invoiceID', select: 'title' })
-    // .populate('createdBy', 'username');
+// FILTER
+const filterInvoice = async (req, res) => {
+    const { keyword } = req.query
+    const filter = keyword
+        ? {
+              $or: [{ method: { $regex: new RegExp(`${keyword}`, 'i') } }],
+          }
+        : {}
+
+    const filters = {
+        ...filter,
+    }
+
+    const [invoices, total] = await Promise.all([
+        InvoiceModel.find(filters),
+        InvoiceModel.find(filters).countDocuments(),
+    ])
 
     res.send({
         success: 1,
         data: invoices,
+        Total: total,
+    })
+}
+
+// GET ALL
+const getAllInvoices = async (req, res) => {
+    const { page, limit, sortDirection, sortField } = req.query
+
+    const pagination = {
+        page: page > 0 ? Number(page) : 1,
+        limit: limit > 0 ? Number(limit) : 2,
+    }
+    pagination.skip = (pagination.page - 1) * pagination.limit
+
+    const sortDirectionParams = sortDirection ? Number(sortDirection) : -1
+    const sortFieldParams = sortField
+        ? {
+              [sortField]: sortDirectionParams,
+          }
+        : { createdAt: sortDirectionParams }
+
+    const [invoices, total] = await Promise.all([
+        InvoiceModel.find()
+            .sort(sortFieldParams)
+            .skip(pagination.skip)
+            .limit(pagination.limit),
+        InvoiceModel.find().countDocuments(),
+    ])
+
+    let totalPage = Math.ceil(total / pagination.limit)
+
+    res.send({
+        success: 1,
+        data: invoices,
+        Paging: {
+            CurrentPage: pagination.page,
+            Limit: pagination.limit,
+            TotalPage: totalPage,
+            Total: total,
+        },
     })
 }
 
@@ -82,6 +134,7 @@ const deleteInvoice = async (req, res) => {
 }
 
 module.exports = {
+    filterInvoice,
     getAllInvoices,
     getInvoice,
     createInvoice,

@@ -1,7 +1,8 @@
 const router = require('express').Router()
-const isAuth = require('../../middleware/isAuth')
+const isAuth = require('../../middlewares/isAuth')
 const authController = require('./controller')
 
+router.get('/filter', isAuth, authController.filterAccount)
 router.get('/', isAuth, authController.getAllAccounts)
 router.get('/:accountID', isAuth, authController.getAccount)
 router.post('/', isAuth, authController.createAccount)

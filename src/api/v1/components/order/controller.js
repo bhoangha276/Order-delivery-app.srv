@@ -1,15 +1,70 @@
 const OrderModel = require('./model')
 const HttpError = require('../../utilities/httpError')
 
-// GET ALL
-const getAllOrders = async (req, res) => {
-    const orders = await OrderModel.find()
-    // .populate({ path: 'orderID', select: 'title' })
-    // .populate('createdBy', 'username');
+// FILTER
+const filterOrder = async (req, res) => {
+    const { keyword } = req.query
+    const filter = keyword
+        ? {
+              $or: [
+                  { orderCode: { $regex: new RegExp(`${keyword}`, 'i') } },
+                  { address: { $regex: new RegExp(`${keyword}`, 'i') } },
+              ],
+          }
+        : {}
+
+    const filters = {
+        ...filter,
+    }
+
+    const [orders, total] = await Promise.all([
+        OrderModel.find(filters),
+        OrderModel.find(filters).countDocuments(),
+    ])
 
     res.send({
         success: 1,
         data: orders,
+        Total: total,
+    })
+}
+
+// GET ALL
+const getAllOrders = async (req, res) => {
+    const { page, limit, sortDirection, sortField } = req.query
+
+    const pagination = {
+        page: page > 0 ? Number(page) : 1,
+        limit: limit > 0 ? Number(limit) : 2,
+    }
+    pagination.skip = (pagination.page - 1) * pagination.limit
+
+    const sortDirectionParams = sortDirection ? Number(sortDirection) : -1
+    const sortFieldParams = sortField
+        ? {
+              [sortField]: sortDirectionParams,
+          }
+        : { createdAt: sortDirectionParams }
+
+    const [orders, total] = await Promise.all([
+        OrderModel.find()
+            .sort(sortFieldParams)
+            .skip(pagination.skip)
+            .limit(pagination.limit),
+        OrderModel.find().countDocuments(),
+    ])
+
+    let totalPage = Math.ceil(total / pagination.limit)
+
+    res.send({
+        success: 1,
+        data: orders,
+        Paging: {
+            CurrentPage: pagination.page,
+            Limit: pagination.limit,
+            TotalPage: totalPage,
+            Total: total,
+        },
     })
 }
 
@@ -82,6 +137,7 @@ const deleteOrder = async (req, res) => {
 }
 
 module.exports = {
+    filterOrder,
     getAllOrders,
     getOrder,
     createOrder,

@@ -3,13 +3,40 @@ const HttpError = require('../../utilities/httpError')
 
 // GET ALL
 const getAllOrderItems = async (req, res) => {
-    const orderItems = await OrderItemModel.find()
-    // .populate({ path: 'orderItemID', select: 'title' })
-    // .populate('createdBy', 'username');
+    const { page, limit, sortDirection, sortField } = req.query
+
+    const pagination = {
+        page: page > 0 ? Number(page) : 1,
+        limit: limit > 0 ? Number(limit) : 2,
+    }
+    pagination.skip = (pagination.page - 1) * pagination.limit
+
+    const sortDirectionParams = sortDirection ? Number(sortDirection) : -1
+    const sortFieldParams = sortField
+        ? {
+              [sortField]: sortDirectionParams,
+          }
+        : { createdAt: sortDirectionParams }
+
+    const [orderItems, total] = await Promise.all([
+        OrderItemModel.find()
+            .sort(sortFieldParams)
+            .skip(pagination.skip)
+            .limit(pagination.limit),
+        OrderItemModel.find().countDocuments(),
+    ])
+
+    let totalPage = Math.ceil(total / pagination.limit)
 
     res.send({
         success: 1,
         data: orderItems,
+        Paging: {
+            CurrentPage: pagination.page,
+            Limit: pagination.limit,
+            TotalPage: totalPage,
+            Total: total,
+        },
     })
 }
 

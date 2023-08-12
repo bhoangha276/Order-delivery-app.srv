@@ -1,6 +1,7 @@
 const router = require('express').Router()
 const userController = require('./controller')
 
+router.get('/filter', userController.filterUser)
 router.get('/', userController.getAllUsers)
 router.get('/:userID', userController.getUser)
 router.post(

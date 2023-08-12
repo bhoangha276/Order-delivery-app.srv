@@ -1,6 +1,7 @@
 const router = require('express').Router()
 const menuController = require('./controller')
 
+router.get('/filter', menuController.filterMenu)
 router.get('/', menuController.getAllMenus)
 router.get('/:menuID', menuController.getMenu)
 router.post(

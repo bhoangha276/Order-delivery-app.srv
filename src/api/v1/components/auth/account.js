@@ -25,9 +25,7 @@ const AccountSchema = mongoose.Schema(
         phoneVerified: { type: Boolean, default: 0 },
         status: { type: Boolean, default: 1 },
     },
-    {
-        timestamp: true,
-    }
+    { timestamp: true }
 )
 
 const AccountModel = mongoose.model('Account', AccountSchema)

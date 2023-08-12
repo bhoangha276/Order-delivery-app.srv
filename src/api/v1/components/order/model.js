@@ -17,7 +17,7 @@ const OrderSchema = new mongoose.Schema(
             ref: 'Table',
             default: null,
         },
-        orderCode: { type: Number },
+        orderCode: { type: String, trim: true },
         address: { type: String, trim: true, default: '' },
         dateTime: { type: Date },
         status: { type: Boolean, default: 1 },
