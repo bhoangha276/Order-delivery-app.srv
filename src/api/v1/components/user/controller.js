@@ -2,15 +2,73 @@ const UserModel = require('./model')
 const HttpError = require('../../utilities/httpError')
 
 const dateReg = /([12]\d{3}([-/.])(0[1-9]|1[0-2])([-/.])(0[1-9]|[12]\d|3[01]))$/
-// GET ALL
-const getAllUsers = async (req, res) => {
-    const users = await UserModel.find()
-    // .populate({ path: 'userID', select: 'title' })
-    // .populate('createdBy', 'username');
+
+// FILTER
+const filterUser = async (req, res) => {
+    const { keyword } = req.query
+    const filter = keyword
+        ? {
+              $or: [
+                  { name: { $regex: new RegExp(`${keyword}`, 'i') } },
+                  { address: { $regex: new RegExp(`${keyword}`, 'i') } },
+                  { gender: { $regex: new RegExp(`${keyword}`, 'i') } },
+                  { phone: { $regex: new RegExp(`${keyword}`, 'i') } },
+              ],
+          }
+        : {}
+
+    const filters = {
+        ...filter,
+    }
+
+    const [users, total] = await Promise.all([
+        UserModel.find(filters),
+        UserModel.find(filters).countDocuments(),
+    ])
 
     res.send({
         success: 1,
         data: users,
+        Total: total,
+    })
+}
+
+// GET ALL
+const getAllUsers = async (req, res) => {
+    const { page, limit, sortDirection, sortField } = req.query
+
+    const pagination = {
+        page: page > 0 ? Number(page) : 1,
+        limit: limit > 0 ? Number(limit) : 2,
+    }
+    pagination.skip = (pagination.page - 1) * pagination.limit
+
+    const sortDirectionParams = sortDirection ? Number(sortDirection) : -1
+    const sortFieldParams = sortField
+        ? {
+              [sortField]: sortDirectionParams,
+          }
+        : { createdAt: sortDirectionParams }
+
+    const [users, total] = await Promise.all([
+        UserModel.find()
+            .sort(sortFieldParams)
+            .skip(pagination.skip)
+            .limit(pagination.limit),
+        UserModel.find().countDocuments(),
+    ])
+
+    let totalPage = Math.ceil(total / pagination.limit)
+
+    res.send({
+        success: 1,
+        data: users,
+        Paging: {
+            CurrentPage: pagination.page,
+            Limit: pagination.limit,
+            TotalPage: totalPage,
+            Total: total,
+        },
     })
 }
 
@@ -103,6 +161,7 @@ const deleteUser = async (req, res) => {
 }
 
 module.exports = {
+    filterUser,
     getAllUsers,
     getUser,
     createUser,

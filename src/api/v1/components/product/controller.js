@@ -1,13 +1,67 @@
 const ProductModel = require('./model')
 const HttpError = require('../../utilities/httpError')
 
-// GET ALL
-const getAllProducts = async (req, res) => {
-    const products = await ProductModel.find()
+// FILTER
+const filterProduct = async (req, res) => {
+    const { keyword } = req.query
+    const filter = keyword
+        ? {
+              $or: [{ name: { $regex: new RegExp(`${keyword}`, 'i') } }],
+          }
+        : {}
+
+    const filters = {
+        ...filter,
+    }
+
+    const [products, total] = await Promise.all([
+        ProductModel.find(filters),
+        ProductModel.find(filters).countDocuments(),
+    ])
 
     res.send({
         success: 1,
         data: products,
+        Total: total,
+    })
+}
+
+// GET ALL
+const getAllProducts = async (req, res) => {
+    const { page, limit, sortDirection, sortField } = req.query
+
+    const pagination = {
+        page: page > 0 ? Number(page) : 1,
+        limit: limit > 0 ? Number(limit) : 2,
+    }
+    pagination.skip = (pagination.page - 1) * pagination.limit
+
+    const sortDirectionParams = sortDirection ? Number(sortDirection) : -1
+    const sortFieldParams = sortField
+        ? {
+              [sortField]: sortDirectionParams,
+          }
+        : { createdAt: sortDirectionParams }
+
+    const [products, total] = await Promise.all([
+        ProductModel.find()
+            .sort(sortFieldParams)
+            .skip(pagination.skip)
+            .limit(pagination.limit),
+        ProductModel.find().countDocuments(),
+    ])
+
+    let totalPage = Math.ceil(total / pagination.limit)
+
+    res.send({
+        success: 1,
+        data: products,
+        Paging: {
+            CurrentPage: pagination.page,
+            Limit: pagination.limit,
+            TotalPage: totalPage,
+            Total: total,
+        },
     })
 }
 
@@ -80,6 +134,7 @@ const deleteProduct = async (req, res) => {
 }
 
 module.exports = {
+    filterProduct,
     getAllProducts,
     getProduct,
     createProduct,

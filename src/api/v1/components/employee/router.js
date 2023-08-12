@@ -1,6 +1,7 @@
 const router = require('express').Router()
 const employeeController = require('./controller')
 
+router.get('/filter', employeeController.filterEmployee)
 router.get('/', employeeController.getAllEmployees)
 router.get('/:employeeID', employeeController.getEmployee)
 router.post(

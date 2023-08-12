@@ -3,13 +3,70 @@ const AccountModel = require('./account')
 const tokenProvider = require('../../utilities/tokenProvider')
 const HttpError = require('../../utilities/httpError')
 
-// GET ALL
-const getAllAccounts = async (req, res) => {
-    const accounts = await AccountModel.find()
+// FILTER
+const filterAccount = async (req, res) => {
+    const { keyword } = req.query
+    const filter = keyword
+        ? {
+              $or: [
+                  { email: { $regex: new RegExp(`${keyword}`, 'i') } },
+                  { role: { $regex: new RegExp(`${keyword}`, 'i') } },
+              ],
+          }
+        : {}
+
+    const filters = {
+        ...filter,
+    }
+
+    const [accounts, total] = await Promise.all([
+        AccountModel.find(filters),
+        AccountModel.find(filters).countDocuments(),
+    ])
 
     res.send({
         success: 1,
         data: accounts,
+        Total: total,
+    })
+}
+
+// GET ALL
+const getAllAccounts = async (req, res) => {
+    const { page, limit, sortDirection, sortField } = req.query
+
+    const pagination = {
+        page: page > 0 ? Number(page) : 1,
+        limit: limit > 0 ? Number(limit) : 2,
+    }
+    pagination.skip = (pagination.page - 1) * pagination.limit
+
+    const sortDirectionParams = sortDirection ? Number(sortDirection) : -1
+    const sortFieldParams = sortField
+        ? {
+              [sortField]: sortDirectionParams,
+          }
+        : { createdAt: sortDirectionParams }
+
+    const [accounts, total] = await Promise.all([
+        AccountModel.find()
+            .sort(sortFieldParams)
+            .skip(pagination.skip)
+            .limit(pagination.limit),
+        AccountModel.find().countDocuments(),
+    ])
+
+    let totalPage = Math.ceil(total / pagination.limit)
+
+    res.send({
+        success: 1,
+        data: accounts,
+        Paging: {
+            CurrentPage: pagination.page,
+            Limit: pagination.limit,
+            TotalPage: totalPage,
+            Total: total,
+        },
     })
 }
 
@@ -165,6 +222,7 @@ const getAccountInfo = async (req, res) => {
 }
 
 module.exports = {
+    filterAccount,
     getAllAccounts,
     getAccount,
     createAccount,

@@ -1,6 +1,7 @@
 const router = require('express').Router()
 const orderController = require('./controller')
 
+router.get('/filter', orderController.filterOrder)
 router.get('/', orderController.getAllOrders)
 router.get('/:orderID', orderController.getOrder)
 router.post(
