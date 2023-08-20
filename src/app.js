@@ -37,7 +37,7 @@ async function main() {
     app.use(`${api}/uploads`, express.static('uploads'))
 
     app.get('/', (req, res) => {
-        res.send('API is working! => Go to the /doc for details')
+        res.send('API is working! => Go to the /docs for details')
     })
 
     app.use(`${api}/auth`, AuthRoute)
