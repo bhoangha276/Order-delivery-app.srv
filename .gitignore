@@ -3,7 +3,7 @@
 .prettierrc
 .env
 
-node_modules
-uploads
+node_modules/
+uploads/
 
 package-lock.json
