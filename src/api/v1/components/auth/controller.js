@@ -1,28 +1,13 @@
 const bcrypt = require('bcryptjs')
 const AccountModel = require('./account')
+const AccountHandler = require('./service')
 const tokenProvider = require('../../utilities/tokenProvider')
 const HttpError = require('../../utilities/httpError')
 
 // FILTER
 const filterAccount = async (req, res) => {
     const { keyword } = req.query
-    const filter = keyword
-        ? {
-              $or: [
-                  { email: { $regex: new RegExp(`${keyword}`, 'i') } },
-                  { role: { $regex: new RegExp(`${keyword}`, 'i') } },
-              ],
-          }
-        : {}
-
-    const filters = {
-        ...filter,
-    }
-
-    const [accounts, total] = await Promise.all([
-        AccountModel.find(filters),
-        AccountModel.find(filters).countDocuments(),
-    ])
+    const [accounts, total] = await AccountHandler.filterAccountHandler(keyword)
 
     res.send({
         success: 1,
@@ -35,28 +20,13 @@ const filterAccount = async (req, res) => {
 const getAllAccounts = async (req, res) => {
     const { page, limit, sortDirection, sortField } = req.query
 
-    const pagination = {
-        page: page > 0 ? Number(page) : 1,
-        limit: limit > 0 ? Number(limit) : 2,
-    }
-    pagination.skip = (pagination.page - 1) * pagination.limit
-
-    const sortDirectionParams = sortDirection ? Number(sortDirection) : -1
-    const sortFieldParams = sortField
-        ? {
-              [sortField]: sortDirectionParams,
-          }
-        : { createdAt: sortDirectionParams }
-
-    const [accounts, total] = await Promise.all([
-        AccountModel.find()
-            .sort(sortFieldParams)
-            .skip(pagination.skip)
-            .limit(pagination.limit),
-        AccountModel.find().countDocuments(),
-    ])
-
-    let totalPage = Math.ceil(total / pagination.limit)
+    const [accounts, pagination, totalPage, total] =
+        await AccountHandler.getAllAccountHandler(
+            page,
+            limit,
+            sortDirection,
+            sortField
+        )
 
     res.send({
         success: 1,
@@ -72,17 +42,17 @@ const getAllAccounts = async (req, res) => {
 
 // GET BY ID
 const getAccount = async (req, res) => {
-    const id = req.params.accountID.trim()
+    const id = req.params.id.trim()
 
-    const foundAccount = await AccountModel.findById(id)
+    const account = await AccountHandler.getAccountHandler(id)
 
-    if (!foundAccount) {
+    if (!account) {
         throw new HttpError('Not found account!', 404)
     }
 
     res.send({
         success: 1,
-        data: foundAccount,
+        data: account,
     })
 }
 
@@ -90,9 +60,7 @@ const getAccount = async (req, res) => {
 const createAccount = async (req, res) => {
     const newAccountData = req.body
 
-    const updatedAccount = await AccountModel.create({
-        ...newAccountData,
-    })
+    const updatedAccount = await AccountHandler.createAccount(newAccountData)
 
     res.send({
         success: 1,
@@ -106,10 +74,9 @@ const updateAccount = async (req, res) => {
 
     const updateAccountData = req.body
 
-    const updatedAccount = await AccountModel.findOneAndUpdate(
-        { _id: id },
-        updateAccountData,
-        { new: true }
+    const updatedAccount = await AccountHandler.updateAccountHandler(
+        id,
+        updateAccountData
     )
 
     if (!updatedAccount) {
@@ -125,9 +92,7 @@ const updateAccount = async (req, res) => {
 const deleteAccount = async (req, res) => {
     const id = req.params.accountID.trim()
 
-    const deletedAccount = await AccountModel.findOneAndDelete({
-        _id: id,
-    })
+    const deletedAccount = await AccountHandler.deleteAccountHandler(id)
 
     if (!deletedAccount) {
         throw new HttpError('Not found account!', 404)
@@ -142,18 +107,7 @@ const deleteAccount = async (req, res) => {
 const signUp = async (req, res, next) => {
     const { email, password } = req.body
 
-    const existedAccount = await AccountModel.findOne({ email })
-    if (existedAccount) {
-        throw new HttpError('This email address is already used!', 400)
-    }
-
-    //   const salt = await bcrypt.genSalt(10);
-    const hashPassword = await bcrypt.hash(password, 10)
-
-    const newAccount = await AccountModel.create({
-        email,
-        password: hashPassword,
-    })
+    const newAccount = await AccountHandler.signUpHandler(email, password)
 
     const token = tokenProvider.sign(newAccount._id, newAccount.role)
 
@@ -173,14 +127,11 @@ const signUp = async (req, res, next) => {
 // LOGIN
 const login = async (req, res) => {
     const { email, password } = req.body
-    const existedAccount = await AccountModel.findOne({ email })
 
-    if (!existedAccount) {
-        throw new HttpError('Login failed!.', 400)
-    }
-
-    const hastPassword = existedAccount.password
-    const matchedPassword = await bcrypt.compare(password, hastPassword)
+    const [existedAccount, matchedPassword] = await AccountHandler.loginHandler(
+        email,
+        password
+    )
 
     if (!matchedPassword) {
         throw new HttpError('Login failed!', 400)
