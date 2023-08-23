@@ -1,6 +1,8 @@
 const Joi = require('joi')
 
 const createSchema = Joi.object({
+    employeeID: Joi.string(),
+    userID: Joi.string(),
     email: Joi.string()
         .email({ minDomainSegments: 2, tlds: { allow: ['com', 'net'] } })
         .required(),

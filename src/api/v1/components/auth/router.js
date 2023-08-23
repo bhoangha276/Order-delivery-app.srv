@@ -7,7 +7,7 @@ const authValid = require('./validation')
 
 router.get('/filter', isAuth, authController.filterAccount)
 router.get('/', isAuth, authController.getAllAccounts)
-router.get('/:accountID', isAuth, authController.getAccount)
+router.get('/:id', isAuth, authController.getAccount)
 router.post(
     '/',
     isAuth,
