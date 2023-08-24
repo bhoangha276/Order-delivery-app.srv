@@ -69,7 +69,7 @@ const getAccountHandler = async (id) => {
     return null
 }
 
-const createAccount = async (newAccountData) => {
+const createAccountHandler = async (newAccountData) => {
     return await AccountModel.create({
         ...newAccountData,
     })
@@ -119,7 +119,7 @@ module.exports = {
     filterAccountHandler,
     getAllAccountHandler,
     getAccountHandler,
-    createAccount,
+    createAccountHandler,
     updateAccountHandler,
     deleteAccountHandler,
     signUpHandler,

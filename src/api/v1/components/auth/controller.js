@@ -5,6 +5,7 @@ const HttpError = require('../../utilities/httpError')
 // FILTER
 const filterAccount = async (req, res) => {
     const { keyword } = req.query
+
     const [accounts, total] = await AccountHandler.filterAccountHandler(keyword)
 
     res.send({
@@ -58,7 +59,9 @@ const getAccount = async (req, res) => {
 const createAccount = async (req, res) => {
     const newAccountData = req.body
 
-    const updatedAccount = await AccountHandler.createAccount(newAccountData)
+    const updatedAccount = await AccountHandler.createAccountHandler(
+        newAccountData
+    )
 
     res.send({
         success: 1,
