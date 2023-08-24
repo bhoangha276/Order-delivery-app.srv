@@ -7,6 +7,7 @@ const InvoiceSchema = new mongoose.Schema(
             ref: 'Order',
             required: true,
         },
+        cost: { type: Number },
         method: { type: String, required: true },
         status: { type: Boolean, default: 0 },
         dueDate: { type: Date },

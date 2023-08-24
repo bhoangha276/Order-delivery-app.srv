@@ -1,23 +1,12 @@
+const InvoiceHandler = require('./service')
 const InvoiceModel = require('./model')
 const HttpError = require('../../utilities/httpError')
 
 // FILTER
 const filterInvoice = async (req, res) => {
     const { keyword } = req.query
-    const filter = keyword
-        ? {
-              $or: [{ method: { $regex: new RegExp(`${keyword}`, 'i') } }],
-          }
-        : {}
 
-    const filters = {
-        ...filter,
-    }
-
-    const [invoices, total] = await Promise.all([
-        InvoiceModel.find(filters),
-        InvoiceModel.find(filters).countDocuments(),
-    ])
+    const [invoices, total] = await InvoiceHandler.filterInvoiceHandler(keyword)
 
     res.send({
         success: 1,
@@ -30,28 +19,13 @@ const filterInvoice = async (req, res) => {
 const getAllInvoices = async (req, res) => {
     const { page, limit, sortDirection, sortField } = req.query
 
-    const pagination = {
-        page: page > 0 ? Number(page) : 1,
-        limit: limit > 0 ? Number(limit) : 2,
-    }
-    pagination.skip = (pagination.page - 1) * pagination.limit
-
-    const sortDirectionParams = sortDirection ? Number(sortDirection) : -1
-    const sortFieldParams = sortField
-        ? {
-              [sortField]: sortDirectionParams,
-          }
-        : { createdAt: sortDirectionParams }
-
-    const [invoices, total] = await Promise.all([
-        InvoiceModel.find()
-            .sort(sortFieldParams)
-            .skip(pagination.skip)
-            .limit(pagination.limit),
-        InvoiceModel.find().countDocuments(),
-    ])
-
-    let totalPage = Math.ceil(total / pagination.limit)
+    const [invoices, pagination, totalPage, total] =
+        await InvoiceHandler.getAllInvoiceHandler(
+            page,
+            limit,
+            sortDirection,
+            sortField
+        )
 
     res.send({
         success: 1,
@@ -69,8 +43,7 @@ const getAllInvoices = async (req, res) => {
 const getInvoice = async (req, res) => {
     const id = req.params.invoiceID.trim()
 
-    const foundInvoice = await InvoiceModel.findById(id)
-
+    const foundInvoice = await InvoiceHandler.getInvoiceHandler(id)
     if (!foundInvoice) {
         throw new HttpError('Not found invoice!', 404)
     }
@@ -85,9 +58,9 @@ const getInvoice = async (req, res) => {
 const createInvoice = async (req, res) => {
     const newInvoiceData = req.body
 
-    const updatedInvoice = await InvoiceModel.create({
-        ...newInvoiceData,
-    })
+    const updatedInvoice = await InvoiceHandler.createInvoiceHandler(
+        newInvoiceData
+    )
 
     res.send({
         success: 1,
@@ -101,10 +74,9 @@ const updateInvoice = async (req, res) => {
 
     const updateInvoiceData = req.body
 
-    const updatedInvoice = await InvoiceModel.findOneAndUpdate(
-        { _id: id },
-        updateInvoiceData,
-        { new: true }
+    const updatedInvoice = await InvoiceHandler.updateInvoiceHandler(
+        id,
+        updateInvoiceData
     )
 
     if (!updatedInvoice) {
@@ -120,9 +92,7 @@ const updateInvoice = async (req, res) => {
 const deleteInvoice = async (req, res) => {
     const id = req.params.invoiceID.trim()
 
-    const deletedInvoice = await InvoiceModel.findOneAndDelete({
-        _id: id,
-    })
+    const deletedInvoice = await InvoiceHandler.deleteInvoiceHandler(id)
 
     if (!deletedInvoice) {
         throw new HttpError('Not found invoice!', 404)
