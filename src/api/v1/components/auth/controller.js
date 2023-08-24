@@ -1,5 +1,3 @@
-const bcrypt = require('bcryptjs')
-const AccountModel = require('./account')
 const AccountHandler = require('./service')
 const tokenProvider = require('../../utilities/tokenProvider')
 const HttpError = require('../../utilities/httpError')
