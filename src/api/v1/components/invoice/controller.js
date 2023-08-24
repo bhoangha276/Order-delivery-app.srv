@@ -1,5 +1,4 @@
 const InvoiceHandler = require('./service')
-const InvoiceModel = require('./model')
 const HttpError = require('../../utilities/httpError')
 
 // FILTER
