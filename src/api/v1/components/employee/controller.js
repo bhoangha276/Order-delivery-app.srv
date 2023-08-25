@@ -1,28 +1,13 @@
-const EmployeeModel = require('./model')
+const EmployeeHandler = require('./service')
 const HttpError = require('../../utilities/httpError')
 
 // FILTER
 const filterEmployee = async (req, res) => {
     const { keyword } = req.query
-    const filter = keyword
-        ? {
-              $or: [
-                  { name: { $regex: new RegExp(`${keyword}`, 'i') } },
-                  { position: { $regex: new RegExp(`${keyword}`, 'i') } },
-                  { gender: { $regex: new RegExp(`${keyword}`, 'i') } },
-                  { phone: { $regex: new RegExp(`${keyword}`, 'i') } },
-              ],
-          }
-        : {}
 
-    const filters = {
-        ...filter,
-    }
-
-    const [employees, total] = await Promise.all([
-        EmployeeModel.find(filters),
-        EmployeeModel.find(filters).countDocuments(),
-    ])
+    const [employees, total] = await EmployeeHandler.filterEmployeeHandler(
+        keyword
+    )
 
     res.send({
         success: 1,
@@ -35,28 +20,13 @@ const filterEmployee = async (req, res) => {
 const getAllEmployees = async (req, res) => {
     const { page, limit, sortDirection, sortField } = req.query
 
-    const pagination = {
-        page: page > 0 ? Number(page) : 1,
-        limit: limit > 0 ? Number(limit) : 2,
-    }
-    pagination.skip = (pagination.page - 1) * pagination.limit
-
-    const sortDirectionParams = sortDirection ? Number(sortDirection) : -1
-    const sortFieldParams = sortField
-        ? {
-              [sortField]: sortDirectionParams,
-          }
-        : { createdAt: sortDirectionParams }
-
-    const [employees, total] = await Promise.all([
-        EmployeeModel.find()
-            .sort(sortFieldParams)
-            .skip(pagination.skip)
-            .limit(pagination.limit),
-        EmployeeModel.find().countDocuments(),
-    ])
-
-    let totalPage = Math.ceil(total / pagination.limit)
+    const [employees, pagination, totalPage, total] =
+        await EmployeeHandler.getAllEmployeeHandler(
+            page,
+            limit,
+            sortDirection,
+            sortField
+        )
 
     res.send({
         success: 1,
@@ -74,7 +44,7 @@ const getAllEmployees = async (req, res) => {
 const getEmployee = async (req, res) => {
     const id = req.params.employeeID.trim()
 
-    const foundEmployee = await EmployeeModel.findById(id)
+    const foundEmployee = await EmployeeHandler.getEmployeeHandler(id)
 
     if (!foundEmployee) {
         throw new HttpError('Not found employee!', 404)
@@ -90,9 +60,9 @@ const getEmployee = async (req, res) => {
 const createEmployee = async (req, res) => {
     const newEmployeeData = req.body
 
-    const updatedEmployee = await EmployeeModel.create({
-        ...newEmployeeData,
-    })
+    const updatedEmployee = await EmployeeHandler.createEmployeeHandler(
+        newEmployeeData
+    )
 
     res.send({
         success: 1,
@@ -106,10 +76,9 @@ const updateEmployee = async (req, res) => {
 
     const updateEmployeeData = req.body
 
-    const updatedEmployee = await EmployeeModel.findOneAndUpdate(
-        { _id: id },
-        updateEmployeeData,
-        { new: true }
+    const updatedEmployee = await EmployeeHandler.updateEmployeeHandler(
+        id,
+        updateEmployeeData
     )
 
     if (!updatedEmployee) {
@@ -125,10 +94,7 @@ const updateEmployee = async (req, res) => {
 const deleteEmployee = async (req, res) => {
     const id = req.params.employeeID.trim()
 
-    const deletedEmployee = await EmployeeModel.findOneAndDelete({
-        _id: id,
-    })
-
+    const deletedEmployee = await EmployeeHandler.deleteEmployeeHandler(id)
     if (!deletedEmployee) {
         throw new HttpError('Not found employee!', 404)
     }

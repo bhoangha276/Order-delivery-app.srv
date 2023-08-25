@@ -1,27 +1,11 @@
-const TableModel = require('./model')
+const TableHandler = require('./service')
 const HttpError = require('../../utilities/httpError')
 
 // FILTER
 const filterTable = async (req, res) => {
     const { keyword } = req.query
-    const filter = keyword
-        ? {
-              $or: [
-                  //   { number: { $regex: new RegExp(`${keyword}`, 'i') } },
-                  //   { capacity: { $regex: new RegExp(`${keyword}`, 'i') } },
-                  //   { status: { $regex: new RegExp(`${keyword}`, 'i') } },
-              ],
-          }
-        : {}
 
-    const filters = {
-        ...filter,
-    }
-
-    const [tables, total] = await Promise.all([
-        TableModel.find(filters),
-        TableModel.find(filters).countDocuments(),
-    ])
+    const [tables, total] = await TableHandler.filterTableHandler(keyword)
 
     res.send({
         success: 1,
@@ -34,28 +18,13 @@ const filterTable = async (req, res) => {
 const getAllTables = async (req, res) => {
     const { page, limit, sortDirection, sortField } = req.query
 
-    const pagination = {
-        page: page > 0 ? Number(page) : 1,
-        limit: limit > 0 ? Number(limit) : 2,
-    }
-    pagination.skip = (pagination.page - 1) * pagination.limit
-
-    const sortDirectionParams = sortDirection ? Number(sortDirection) : -1
-    const sortFieldParams = sortField
-        ? {
-              [sortField]: sortDirectionParams,
-          }
-        : { createdAt: sortDirectionParams }
-
-    const [tables, total] = await Promise.all([
-        TableModel.find()
-            .sort(sortFieldParams)
-            .skip(pagination.skip)
-            .limit(pagination.limit),
-        TableModel.find().countDocuments(),
-    ])
-
-    let totalPage = Math.ceil(total / pagination.limit)
+    const [tables, pagination, totalPage, total] =
+        await TableHandler.getAllTableHandler(
+            page,
+            limit,
+            sortDirection,
+            sortField
+        )
 
     res.send({
         success: 1,
@@ -73,7 +42,7 @@ const getAllTables = async (req, res) => {
 const getTable = async (req, res) => {
     const id = req.params.tableID.trim()
 
-    const foundTable = await TableModel.findById(id)
+    const foundTable = await TableHandler.getTableHandler(id)
 
     if (!foundTable) {
         throw new HttpError('Not found table!', 404)
@@ -89,9 +58,7 @@ const getTable = async (req, res) => {
 const createTable = async (req, res) => {
     const newTableData = req.body
 
-    const updatedTable = await TableModel.create({
-        ...newTableData,
-    })
+    const updatedTable = await TableHandler.createTableHandler(newTableData)
 
     res.send({
         success: 1,
@@ -105,10 +72,9 @@ const updateTable = async (req, res) => {
 
     const updateTableData = req.body
 
-    const updatedTable = await TableModel.findOneAndUpdate(
-        { _id: id },
-        updateTableData,
-        { new: true }
+    const updatedTable = await TableHandler.updateTableHandler(
+        id,
+        updateTableData
     )
 
     if (!updatedTable) {
@@ -124,9 +90,7 @@ const updateTable = async (req, res) => {
 const deleteTable = async (req, res) => {
     const id = req.params.tableID.trim()
 
-    const deletedTable = await TableModel.findOneAndDelete({
-        _id: id,
-    })
+    const deletedTable = await TableHandler.deleteTableHandler(id)
 
     if (!deletedTable) {
         throw new HttpError('Not found table!', 404)

@@ -1,26 +1,11 @@
-const MenuModel = require('./model')
+const MenuHandler = require('./service')
 const HttpError = require('../../utilities/httpError')
 
 // FILTER
 const filterMenu = async (req, res) => {
     const { keyword } = req.query
-    const filter = keyword
-        ? {
-              $or: [
-                  { name: { $regex: new RegExp(`${keyword}`, 'i') } },
-                  { category: { $regex: new RegExp(`${keyword}`, 'i') } },
-              ],
-          }
-        : {}
 
-    const filters = {
-        ...filter,
-    }
-
-    const [menus, total] = await Promise.all([
-        MenuModel.find(filters),
-        MenuModel.find(filters).countDocuments(),
-    ])
+    const [menus, total] = await MenuHandler.filterMenuHandler(keyword)
 
     res.send({
         success: 1,
@@ -33,28 +18,13 @@ const filterMenu = async (req, res) => {
 const getAllMenus = async (req, res) => {
     const { page, limit, sortDirection, sortField } = req.query
 
-    const pagination = {
-        page: page > 0 ? Number(page) : 1,
-        limit: limit > 0 ? Number(limit) : 2,
-    }
-    pagination.skip = (pagination.page - 1) * pagination.limit
-
-    const sortDirectionParams = sortDirection ? Number(sortDirection) : -1
-    const sortFieldParams = sortField
-        ? {
-              [sortField]: sortDirectionParams,
-          }
-        : { createdAt: sortDirectionParams }
-
-    const [menus, total] = await Promise.all([
-        MenuModel.find()
-            .sort(sortFieldParams)
-            .skip(pagination.skip)
-            .limit(pagination.limit),
-        MenuModel.find().countDocuments(),
-    ])
-
-    let totalPage = Math.ceil(total / pagination.limit)
+    const [menus, pagination, totalPage, total] =
+        await MenuHandler.getAllMenuHandler(
+            page,
+            limit,
+            sortDirection,
+            sortField
+        )
 
     res.send({
         success: 1,
@@ -72,7 +42,7 @@ const getAllMenus = async (req, res) => {
 const getMenu = async (req, res) => {
     const id = req.params.menuID.trim()
 
-    const foundMenu = await MenuModel.findById(id)
+    const foundMenu = await MenuHandler.getMenuHandler(id)
 
     if (!foundMenu) {
         throw new HttpError('Not found menu!', 404)
@@ -88,9 +58,7 @@ const getMenu = async (req, res) => {
 const createMenu = async (req, res) => {
     const newMenuData = req.body
 
-    const updatedMenu = await MenuModel.create({
-        ...newMenuData,
-    })
+    const updatedMenu = await MenuHandler.createMenuHandler(newMenuData)
 
     res.send({
         success: 1,
@@ -104,11 +72,7 @@ const updateMenu = async (req, res) => {
 
     const updateMenuData = req.body
 
-    const updatedMenu = await MenuModel.findOneAndUpdate(
-        { _id: id },
-        updateMenuData,
-        { new: true }
-    )
+    const updatedMenu = await MenuHandler.updateMenuHandler(id, updateMenuData)
 
     if (!updatedMenu) {
         throw new HttpError('Not found menu!', 404)
@@ -123,10 +87,7 @@ const updateMenu = async (req, res) => {
 const deleteMenu = async (req, res) => {
     const id = req.params.menuID.trim()
 
-    const deletedMenu = await MenuModel.findOneAndDelete({
-        _id: id,
-    })
-
+    const deletedMenu = await MenuHandler.deleteMenuHandler(id)
     if (!deletedMenu) {
         throw new HttpError('Not found menu!', 404)
     }

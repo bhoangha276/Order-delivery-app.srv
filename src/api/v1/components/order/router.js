@@ -3,7 +3,7 @@ const orderController = require('./controller')
 
 router.get('/filter', orderController.filterOrder)
 router.get('/', orderController.getAllOrders)
-router.get('/:orderID', orderController.getOrder)
+router.get('/:id', orderController.getOrder)
 router.post(
     '/',
     // validateInput(postValid.createPostSchema, 'body'),
