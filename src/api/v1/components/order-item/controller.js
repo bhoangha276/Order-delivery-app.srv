@@ -1,32 +1,17 @@
-const OrderItemModel = require('./model')
+const OrderItemHandler = require('./service')
 const HttpError = require('../../utilities/httpError')
 
 // GET ALL
 const getAllOrderItems = async (req, res) => {
     const { page, limit, sortDirection, sortField } = req.query
 
-    const pagination = {
-        page: page > 0 ? Number(page) : 1,
-        limit: limit > 0 ? Number(limit) : 2,
-    }
-    pagination.skip = (pagination.page - 1) * pagination.limit
-
-    const sortDirectionParams = sortDirection ? Number(sortDirection) : -1
-    const sortFieldParams = sortField
-        ? {
-              [sortField]: sortDirectionParams,
-          }
-        : { createdAt: sortDirectionParams }
-
-    const [orderItems, total] = await Promise.all([
-        OrderItemModel.find()
-            .sort(sortFieldParams)
-            .skip(pagination.skip)
-            .limit(pagination.limit),
-        OrderItemModel.find().countDocuments(),
-    ])
-
-    let totalPage = Math.ceil(total / pagination.limit)
+    const [orderItems, pagination, totalPage, total] =
+        await OrderItemHandler.getAllOrderIHandler(
+            page,
+            limit,
+            sortDirection,
+            sortField
+        )
 
     res.send({
         success: 1,
@@ -44,7 +29,7 @@ const getAllOrderItems = async (req, res) => {
 const getOrderItem = async (req, res) => {
     const id = req.params.orderItemID.trim()
 
-    const foundOrderItem = await OrderItemModel.findById(id)
+    const foundOrderItem = await OrderItemHandler.getOrderIHandler(id)
 
     if (!foundOrderItem) {
         throw new HttpError('Not found order-item!', 404)
@@ -60,9 +45,9 @@ const getOrderItem = async (req, res) => {
 const createOrderItem = async (req, res) => {
     const newOrderItemData = req.body
 
-    const updatedOrderItem = await OrderItemModel.create({
-        ...newOrderItemData,
-    })
+    const updatedOrderItem = await OrderItemHandler.createOrderIHandler(
+        newOrderItemData
+    )
 
     res.send({
         success: 1,
@@ -76,10 +61,9 @@ const updateOrderItem = async (req, res) => {
 
     const updateOrderItemData = req.body
 
-    const updatedOrderItem = await OrderItemModel.findOneAndUpdate(
-        { _id: id },
-        updateOrderItemData,
-        { new: true }
+    const updatedOrderItem = await OrderItemHandler.updateOrderIHandler(
+        id,
+        updateOrderItemData
     )
 
     if (!updatedOrderItem) {
@@ -95,9 +79,7 @@ const updateOrderItem = async (req, res) => {
 const deleteOrderItem = async (req, res) => {
     const id = req.params.orderItemID.trim()
 
-    const deletedOrderItem = await OrderItemModel.findOneAndDelete({
-        _id: id,
-    })
+    const deletedOrderItem = await OrderItemHandler.deleteOrderIHandler(id)
 
     if (!deletedOrderItem) {
         throw new HttpError('Not found order-item!', 404)

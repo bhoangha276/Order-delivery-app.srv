@@ -3,7 +3,7 @@ const invoiceController = require('./controller')
 
 router.get('/filter', invoiceController.filterInvoice)
 router.get('/', invoiceController.getAllInvoices)
-router.get('/:invoiceID', invoiceController.getInvoice)
+router.get('/:id', invoiceController.getInvoice)
 router.post(
     '/',
     // validateInput(postValid.createPostSchema, 'body'),

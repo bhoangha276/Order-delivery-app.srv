@@ -53,26 +53,26 @@ const getInvoiceHandler = async (id) => {
         return data
     }
 
-    // FIND BY EMPLOYEE_ID
-    const foundByEmployeeID = await InvoiceModel.findOne({
+    // FIND BY ORDER_ID
+    const foundByOrderID = await InvoiceModel.findOne({
         orderID: new mongoose.Types.ObjectId(id),
-    }).exec()
-    if (foundByEmployeeID) {
-        const data = foundByEmployeeID
+    })
+    if (foundByOrderID) {
+        const data = foundByOrderID
         return data
     }
 
     return null
 }
 
-const createInvoiceHandler = async (newInvoiceData) => {
+const createInvoiceHandler = async (data) => {
     return await InvoiceModel.create({
-        ...newInvoiceData,
+        ...data,
     })
 }
 
-const updateInvoiceHandler = async (id, updateInvoiceData) => {
-    return await InvoiceModel.findOneAndUpdate({ _id: id }, updateInvoiceData, {
+const updateInvoiceHandler = async (id, data) => {
+    return await InvoiceModel.findOneAndUpdate({ _id: id }, data, {
         new: true,
     })
 }

@@ -7,7 +7,7 @@ const authValid = require('./validation')
 
 router.get('/filter', productController.filterProduct)
 router.get('/', productController.getAllProducts)
-router.get('/:productID', productController.getProduct)
+router.get('/:id', productController.getProduct)
 router.post(
     '/',
     validateInput(authValid.createSchema, 'body'),

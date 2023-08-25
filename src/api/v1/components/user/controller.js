@@ -1,28 +1,11 @@
-const UserModel = require('./model')
+const UserHandler = require('./service')
 const HttpError = require('../../utilities/httpError')
 
 // FILTER
 const filterUser = async (req, res) => {
     const { keyword } = req.query
-    const filter = keyword
-        ? {
-              $or: [
-                  { name: { $regex: new RegExp(`${keyword}`, 'i') } },
-                  { address: { $regex: new RegExp(`${keyword}`, 'i') } },
-                  { gender: { $regex: new RegExp(`${keyword}`, 'i') } },
-                  { phone: { $regex: new RegExp(`${keyword}`, 'i') } },
-              ],
-          }
-        : {}
 
-    const filters = {
-        ...filter,
-    }
-
-    const [users, total] = await Promise.all([
-        UserModel.find(filters),
-        UserModel.find(filters).countDocuments(),
-    ])
+    const [users, total] = await UserHandler.filterUserHandler(keyword)
 
     res.send({
         success: 1,
@@ -35,28 +18,13 @@ const filterUser = async (req, res) => {
 const getAllUsers = async (req, res) => {
     const { page, limit, sortDirection, sortField } = req.query
 
-    const pagination = {
-        page: page > 0 ? Number(page) : 1,
-        limit: limit > 0 ? Number(limit) : 2,
-    }
-    pagination.skip = (pagination.page - 1) * pagination.limit
-
-    const sortDirectionParams = sortDirection ? Number(sortDirection) : -1
-    const sortFieldParams = sortField
-        ? {
-              [sortField]: sortDirectionParams,
-          }
-        : { createdAt: sortDirectionParams }
-
-    const [users, total] = await Promise.all([
-        UserModel.find()
-            .sort(sortFieldParams)
-            .skip(pagination.skip)
-            .limit(pagination.limit),
-        UserModel.find().countDocuments(),
-    ])
-
-    let totalPage = Math.ceil(total / pagination.limit)
+    const [users, pagination, totalPage, total] =
+        await UserHandler.getAllUserHandler(
+            page,
+            limit,
+            sortDirection,
+            sortField
+        )
 
     res.send({
         success: 1,
@@ -74,7 +42,7 @@ const getAllUsers = async (req, res) => {
 const getUser = async (req, res) => {
     const id = req.params.userID.trim()
 
-    const foundUser = await UserModel.findById(id)
+    const foundUser = await UserHandler.getUserHandler(id)
 
     if (!foundUser) {
         throw new HttpError('Not found user!', 404)
@@ -90,9 +58,7 @@ const getUser = async (req, res) => {
 const createUser = async (req, res) => {
     const newUserData = req.body
 
-    const updatedUser = await UserModel.create({
-        ...newUserData,
-    })
+    const updatedUser = await UserHandler.createUserHandler(newUserData)
 
     res.send({
         success: 1,
@@ -106,11 +72,7 @@ const updateUser = async (req, res) => {
 
     const updateUserData = req.body
 
-    const updatedUser = await UserModel.findOneAndUpdate(
-        { _id: id },
-        updateUserData,
-        { new: true }
-    )
+    const updatedUser = await UserHandler.updateUserHandler(id, updateUserData)
 
     if (!updatedUser) {
         throw new HttpError('Not found user!', 404)
@@ -125,9 +87,7 @@ const updateUser = async (req, res) => {
 const deleteUser = async (req, res) => {
     const id = req.params.userID.trim()
 
-    const deletedUser = await UserModel.findOneAndDelete({
-        _id: id,
-    })
+    const deletedUser = await UserHandler.deleteUserHandler(id)
 
     if (!deletedUser) {
         throw new HttpError('Not found user!', 404)

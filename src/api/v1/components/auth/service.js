@@ -57,26 +57,29 @@ const getAccountHandler = async (id) => {
         return data
     }
 
-    // FIND BY EMPLOYEE_ID
-    const foundByEmployeeID = await AccountModel.findOne({
-        employeeID: new mongoose.Types.ObjectId(id),
-    }).exec()
-    if (foundByEmployeeID) {
-        const data = foundByEmployeeID
-        return data
+    // FIND BY EMPLOYEE_ID || USER_ID
+    const foundAccount = await AccountModel.findOne({
+        $or: [
+            { employeeID: new mongoose.Types.ObjectId(id) },
+            { userID: new mongoose.Types.ObjectId(id) },
+        ],
+    })
+
+    if (foundAccount) {
+        return (data = foundAccount)
     }
 
     return null
 }
 
-const createAccountHandler = async (newAccountData) => {
+const createAccountHandler = async (data) => {
     return await AccountModel.create({
-        ...newAccountData,
+        ...data,
     })
 }
 
-const updateAccountHandler = async (id, updateAccountData) => {
-    return await AccountModel.findOneAndUpdate({ _id: id }, updateAccountData, {
+const updateAccountHandler = async (id, data) => {
+    return await AccountModel.findOneAndUpdate({ _id: id }, data, {
         new: true,
     })
 }

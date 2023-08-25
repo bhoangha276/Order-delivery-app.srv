@@ -1,26 +1,11 @@
-const OrderModel = require('./model')
+const OrderHandler = require('./service')
 const HttpError = require('../../utilities/httpError')
 
 // FILTER
 const filterOrder = async (req, res) => {
     const { keyword } = req.query
-    const filter = keyword
-        ? {
-              $or: [
-                  { orderCode: { $regex: new RegExp(`${keyword}`, 'i') } },
-                  { address: { $regex: new RegExp(`${keyword}`, 'i') } },
-              ],
-          }
-        : {}
 
-    const filters = {
-        ...filter,
-    }
-
-    const [orders, total] = await Promise.all([
-        OrderModel.find(filters),
-        OrderModel.find(filters).countDocuments(),
-    ])
+    const [orders, total] = await OrderHandler.filterOrderHandler(keyword)
 
     res.send({
         success: 1,
@@ -33,28 +18,13 @@ const filterOrder = async (req, res) => {
 const getAllOrders = async (req, res) => {
     const { page, limit, sortDirection, sortField } = req.query
 
-    const pagination = {
-        page: page > 0 ? Number(page) : 1,
-        limit: limit > 0 ? Number(limit) : 2,
-    }
-    pagination.skip = (pagination.page - 1) * pagination.limit
-
-    const sortDirectionParams = sortDirection ? Number(sortDirection) : -1
-    const sortFieldParams = sortField
-        ? {
-              [sortField]: sortDirectionParams,
-          }
-        : { createdAt: sortDirectionParams }
-
-    const [orders, total] = await Promise.all([
-        OrderModel.find()
-            .sort(sortFieldParams)
-            .skip(pagination.skip)
-            .limit(pagination.limit),
-        OrderModel.find().countDocuments(),
-    ])
-
-    let totalPage = Math.ceil(total / pagination.limit)
+    const [orders, pagination, totalPage, total] =
+        await OrderHandler.getAllOrderHandler(
+            page,
+            limit,
+            sortDirection,
+            sortField
+        )
 
     res.send({
         success: 1,
@@ -70,9 +40,9 @@ const getAllOrders = async (req, res) => {
 
 // GET BY ID
 const getOrder = async (req, res) => {
-    const id = req.params.orderID.trim()
+    const id = req.params.id.trim()
 
-    const foundOrder = await OrderModel.findById(id)
+    const foundOrder = await OrderHandler.getOrderHandler(id)
 
     if (!foundOrder) {
         throw new HttpError('Not found order!', 404)
@@ -88,9 +58,7 @@ const getOrder = async (req, res) => {
 const createOrder = async (req, res) => {
     const newOrderData = req.body
 
-    const updatedOrder = await OrderModel.create({
-        ...newOrderData,
-    })
+    const updatedOrder = await OrderHandler.createOrderHandler(newOrderData)
 
     res.send({
         success: 1,
@@ -104,10 +72,9 @@ const updateOrder = async (req, res) => {
 
     const updateOrderData = req.body
 
-    const updatedOrder = await OrderModel.findOneAndUpdate(
-        { _id: id },
-        updateOrderData,
-        { new: true }
+    const updatedOrder = await OrderHandler.updateOrderHandler(
+        id,
+        updateOrderData
     )
 
     if (!updatedOrder) {
@@ -123,9 +90,7 @@ const updateOrder = async (req, res) => {
 const deleteOrder = async (req, res) => {
     const id = req.params.orderID.trim()
 
-    const deletedOrder = await OrderModel.findOneAndDelete({
-        _id: id,
-    })
+    const deletedOrder = await OrderHandler.deleteOrderHandler(id)
 
     if (!deletedOrder) {
         throw new HttpError('Not found order!', 404)

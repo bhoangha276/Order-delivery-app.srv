@@ -51,14 +51,14 @@ const getMenuHandler = async (id) => {
     return await MenuModel.findById(id)
 }
 
-const createMenuHandler = async (newMenuData) => {
+const createMenuHandler = async (data) => {
     return await MenuModel.create({
-        ...newMenuData,
+        ...data,
     })
 }
 
-const updateMenuHandler = async (id, updateMenuData) => {
-    return await MenuModel.findOneAndUpdate({ _id: id }, updateMenuData, {
+const updateMenuHandler = async (id, data) => {
+    return await MenuModel.findOneAndUpdate({ _id: id }, data, {
         new: true,
     })
 }

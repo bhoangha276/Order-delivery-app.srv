@@ -53,18 +53,16 @@ const getEmployeeHandler = async (id) => {
     return await EmployeeModel.findById(id)
 }
 
-const createEmployeeHandler = async (newEmployeeData) => {
+const createEmployeeHandler = async (data) => {
     return await EmployeeModel.create({
-        ...newEmployeeData,
+        ...data,
     })
 }
 
-const updateEmployeeHandler = async (id, updateEmployeeData) => {
-    return await EmployeeModel.findOneAndUpdate(
-        { _id: id },
-        updateEmployeeData,
-        { new: true }
-    )
+const updateEmployeeHandler = async (id, data) => {
+    return await EmployeeModel.findOneAndUpdate({ _id: id }, data, {
+        new: true,
+    })
 }
 
 const deleteEmployeeHandler = async (id) => {
