@@ -15,9 +15,9 @@ const InvoiceRoute = require('./components/invoice')
 const TableRoute = require('./components/table')
 const UploadRouter = require('./components/upload')
 
-const config = require('../../config')
+const config = require('./config')
 
-const api = config.configApp.api
+const api = config.App.api
 
 const app = express()
 app.use(cors())

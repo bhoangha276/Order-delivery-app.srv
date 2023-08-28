@@ -1,19 +1,16 @@
 require('express-async-errors')
 
-const config = require('./config')
+const config = require('./api/v1/config')
 const mongoDB = require('../db')
 const app = require('./api/v1/app')
 
 async function main() {
-    await mongoDB.connect(
-        config.configApp.mongo_uri,
-        config.configApp.connectOptions
-    )
+    await mongoDB.connect(config.App.mongoUri, config.App.connectOptions)
 
-    app.listen(config.configApp.port, (err) => {
+    app.listen(config.App.port, (err) => {
         if (err) throw err
         console.log(
-            `Order-delivery-management server is running http://localhost:${config.configApp.port}`
+            `Order-delivery-management server is running http://localhost:${config.App.port}`
         )
     })
 
