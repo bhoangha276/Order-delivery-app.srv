@@ -112,6 +112,10 @@ const signUp = async (req, res, next) => {
 
     const token = tokenProvider.sign(newAccount._id, newAccount.role)
 
+    // Send email to verify
+    const result = await AccountHandler.sendEmailHandler(newAccount, token)
+    console.log(result)
+
     res.send({
         success: 1,
         data: {
@@ -122,6 +126,7 @@ const signUp = async (req, res, next) => {
             phone_verified: newAccount.phoneVerified,
             token: token,
         },
+        message: 'An Email sent to your account please verify!',
     })
 }
 
@@ -133,6 +138,10 @@ const login = async (req, res) => {
         email,
         password
     )
+
+    if (!existedAccount.emailVerified) {
+        throw new HttpError('Your email has not been verified!', 400)
+    }
 
     if (!matchedPassword) {
         throw new HttpError('Login failed!', 400)
@@ -148,6 +157,18 @@ const login = async (req, res) => {
             email: existedAccount.email,
             email_verfied: existedAccount.emailVerified,
             phone_verified: existedAccount.phoneVerified,
+            token: token,
+        },
+    })
+}
+
+const verifyAccount = async (req, res) => {
+    const { accountID, token } = req.body
+
+    res.send({
+        success: 1,
+        data: {
+            id: accountID,
             token: token,
         },
     })
@@ -172,7 +193,9 @@ module.exports = {
     createAccount,
     updateAccount,
     deleteAccount,
+
     signUp,
     login,
+    verifyAccount,
     getAccountInfo,
 }

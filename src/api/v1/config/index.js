@@ -1,6 +1,7 @@
 require('dotenv').config()
 
 const App = {
+    baseUrl: process.env.BASE_URL,
     api: process.env.API_URL,
     port: process.env.PORT || 8000,
 
@@ -19,7 +20,23 @@ const Firebase = {
     appId: process.env.FIREBASE_APP_ID,
 }
 
+const Email = {
+    host: process.env.HOST,
+    service: process.env.SERVICE,
+    user: process.env.USER,
+    pass: process.env.PASS,
+}
+
+const GoogleApis = {
+    clientId: process.env.CLIENT_ID,
+    clientSecret: process.env.CLIENT_SECRET,
+    redirectUri: process.env.REDIRECT_URI,
+    refreshToken: process.env.REFRESH_TOKEN,
+}
+
 module.exports = {
     App,
     Firebase,
+    Email,
+    GoogleApis,
 }

@@ -2,6 +2,10 @@ const bcrypt = require('bcryptjs')
 const AccountModel = require('./account')
 const mongoose = require('mongoose')
 
+const config = require('../../config')
+const mail = require('../../utilities/mail')
+const googleApis = require('../../utilities/googleApis')
+
 const filterAccountHandler = async (keyword) => {
     const filter = keyword
         ? {
@@ -93,7 +97,7 @@ const deleteAccountHandler = async (id) => {
 const signUpHandler = async (email, password) => {
     const existedAccount = await AccountModel.findOne({ email })
     if (existedAccount) {
-        throw new HttpError('This email address is already used!', 400)
+        throw new Error('This email address is already used!', 400)
     }
 
     //   const salt = await bcrypt.genSalt(10);
@@ -103,6 +107,55 @@ const signUpHandler = async (email, password) => {
         email,
         password: hashPassword,
     })
+}
+
+const sendEmailHandler = async (account, token) => {
+    const address = account.email
+    const subject = 'Account Verification Token'
+    const link = `${config.App.baseUrl}${config.App.port}${config.App.api}/verify/${account._id}/${token}`
+    const message = `<p>Welcom you.<p><br><p>Please click on the following <a href="${link}">link</a> to verify your account.</p> 
+    <br><p>If you did not request this, please ignore this email.</p>`
+
+    const googleApiConfig = {
+        clientId: config.GoogleApis.clientId,
+        clientSecret: config.GoogleApis.clientSecret,
+        redirectUri: config.GoogleApis.redirectUri,
+        refreshToken: config.GoogleApis.refreshToken,
+    }
+
+    const accessToken = await googleApis.accessToken(googleApiConfig)
+
+    const transportConfig = {
+        // host: config.Email.host,
+        service: config.Email.service,
+        // port: 587,
+        // secure: false, // true for 465, false for other ports
+        // logger: true,
+        // debug: true,
+        // secureConnection: false,
+        auth: {
+            type: 'OAuth2',
+            user: config.Email.user,
+            // pass: config.Email.pass,
+            clientId: googleApiConfig.clientId,
+            clientSecret: googleApiConfig.clientSecret,
+            refreshToken: googleApiConfig.refreshToken,
+            accessToken: accessToken,
+            expires: 1484314697598,
+        },
+        // tls: {
+        //     rejectUnAuthorized: false,
+        // },
+    }
+
+    const mailOptions = {
+        from: config.Email.user,
+        to: address,
+        subject: subject,
+        text: message,
+    }
+
+    return await mail.sendEmail(transportConfig, mailOptions)
 }
 
 const loginHandler = async (email, password) => {
@@ -126,5 +179,6 @@ module.exports = {
     updateAccountHandler,
     deleteAccountHandler,
     signUpHandler,
+    sendEmailHandler,
     loginHandler,
 }
