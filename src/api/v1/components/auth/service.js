@@ -113,7 +113,7 @@ const sendEmailHandler = async (account, token) => {
     const address = account.email
     const subject = 'Account Verification Token'
     const link = `${config.App.baseUrl}${config.App.port}${config.App.api}/verify/${account._id}/${token}`
-    const message = `<p>Welcom you.<p><br><p>Please click on the following <a href="${link}">link</a> to verify your account.</p> 
+    const message = `<p>Welcom you.<p><br><p>Please click on the following <a href="${link}">link-here</a> to verify your account.</p> 
     <br><p>If you did not request this, please ignore this email.</p>`
 
     const googleApiConfig = {
@@ -149,10 +149,10 @@ const sendEmailHandler = async (account, token) => {
     }
 
     const mailOptions = {
-        from: config.Email.user,
+        from: `ADMIN-ODM 📢 <${config.Email.user}>`,
         to: address,
         subject: subject,
-        text: message,
+        html: message,
     }
 
     return await mail.sendEmail(transportConfig, mailOptions)

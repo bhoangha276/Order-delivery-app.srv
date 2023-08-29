@@ -21,10 +21,10 @@ const Firebase = {
 }
 
 const Email = {
-    host: process.env.HOST,
-    service: process.env.SERVICE,
-    user: process.env.USER,
-    pass: process.env.PASS,
+    host: process.env.EMAIL_HOST,
+    service: process.env.EMAIL_SERVICE,
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
 }
 
 const GoogleApis = {

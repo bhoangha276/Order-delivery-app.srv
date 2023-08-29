@@ -4,10 +4,10 @@ const sendEmail = async (transportConfig, mailOptions) => {
     try {
         const transporter = nodemailer.createTransport(transportConfig)
 
-        transporter.verify((err, success) => {
-            // if (err) throw Error(err)
-            // console.log('Your config is correct')
-        })
+        // transporter.verify((err, success) => {
+        //     // if (err) throw Error(err)
+        //     // console.log('Your config is correct')
+        // })
 
         return await transporter.sendMail(mailOptions)
     } catch (err) {

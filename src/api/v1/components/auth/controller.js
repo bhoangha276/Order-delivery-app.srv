@@ -110,7 +110,7 @@ const signUp = async (req, res, next) => {
 
     const newAccount = await AccountHandler.signUpHandler(email, password)
 
-    const token = tokenProvider.sign(newAccount._id, newAccount.role)
+    const token = await tokenProvider.sign(newAccount._id, newAccount.role)
 
     // Send email to verify
     const result = await AccountHandler.sendEmailHandler(newAccount, token)
