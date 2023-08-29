@@ -10,7 +10,7 @@ async function main() {
     app.listen(config.App.port, (err) => {
         if (err) throw err
         console.log(
-            `Order-delivery-management server is running http://localhost:${config.App.port}`
+            `Order-delivery-management server is running ${config.App.baseUrl}${config.App.port}`
         )
     })
 

@@ -32,6 +32,9 @@ router.post(
     validateInput(authValid.loginSchema, 'body'),
     authController.login
 )
+
+router.get('/verify/:accountID/:token', authController.verifyAccount)
+
 router.get('/me', authController.getAccountInfo)
 
 module.exports = router
