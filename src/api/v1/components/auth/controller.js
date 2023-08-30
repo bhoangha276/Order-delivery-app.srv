@@ -163,14 +163,20 @@ const login = async (req, res) => {
 }
 
 const verifyAccount = async (req, res) => {
-    const { accountID, token } = req.body
+    const { accountID, token } = req.params
+
+    const verifiedAccount = await AccountHandler.verifyAccountHandler(
+        accountID,
+        token
+    )
+
+    if (!verifiedAccount) {
+        throw new HttpError('Not found account!', 404)
+    }
 
     res.send({
         success: 1,
-        data: {
-            id: accountID,
-            token: token,
-        },
+        message: 'Email verified sucessfully',
     })
 }
 
