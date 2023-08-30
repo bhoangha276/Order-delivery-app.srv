@@ -11,6 +11,12 @@ const App = {
     },
 }
 
+const JWT = {
+    privateKey: process.env.JWT_PRIVATE_KEY,
+    expireTime: process.env.JWT_EXPIRE_TIME,
+    refreshToken: process.env.JWT_REFRESH_TOKEN,
+}
+
 const Firebase = {
     apiKey: process.env.FIREBASE_API_KEY,
     authDomain: process.env.FIREBASE_AUTH_DOMAIN,
@@ -39,4 +45,5 @@ module.exports = {
     Firebase,
     Email,
     GoogleApis,
+    JWT,
 }
