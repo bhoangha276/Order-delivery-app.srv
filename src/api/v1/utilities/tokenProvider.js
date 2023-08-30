@@ -1,19 +1,20 @@
 const jwt = require('jsonwebtoken')
+const config = require('../config')
 
 const sign = (id, role) => {
     const identityData = {
         id,
         role,
     }
-    const token = jwt.sign(identityData, process.env.PRIVATE_KEY, {
-        expiresIn: process.env.EXPIRE_TIME,
+    const token = jwt.sign(identityData, config.JWT.privateKey, {
+        expiresIn: config.JWT.expireTime,
     })
 
     return token
 }
 
 const verify = (token) => {
-    return jwt.verify(token, process.env.PRIVATE_KEY)
+    return jwt.verify(token, config.JWT.privateKey)
 }
 
 module.exports = {
