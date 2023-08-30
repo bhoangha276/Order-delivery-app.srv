@@ -7,7 +7,7 @@ const app = require('./api/v1/app')
 async function main() {
     await mongoDB.connect(config.App.mongoUri, config.App.connectOptions)
 
-    app.listen(config.App.port, (err) => {
+    const server = app.listen(config.App.port, (err) => {
         if (err) throw err
         console.log(
             `Order-delivery-management server is running ${config.App.baseUrl}${config.App.port}`
@@ -15,7 +15,7 @@ async function main() {
     })
 
     process.on('unhandledRejection', (err) => {
-        console.log('UNHANDLED REJECTION!!!  shutting down ...')
+        console.log('UNHANDLED REJECTION!!!\nShutting down ...')
         console.log(err.name, err.message)
         server.close(() => {
             process.exit(1)
