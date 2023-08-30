@@ -5,6 +5,7 @@ const mongoose = require('mongoose')
 const config = require('../../config')
 const mail = require('../../utilities/mail')
 const googleApis = require('../../utilities/googleApis')
+const tokenProvider = require('../../utilities/tokenProvider')
 
 const filterAccountHandler = async (keyword) => {
     const filter = keyword
@@ -112,7 +113,7 @@ const signUpHandler = async (email, password) => {
 const sendEmailHandler = async (account, token) => {
     const address = account.email
     const subject = 'Account Verification Token'
-    const link = `${config.App.baseUrl}${config.App.port}${config.App.api}/verify/${account._id}/${token}`
+    const link = `${config.App.baseUrl}${config.App.port}${config.App.api}/auth/verify/${account._id}/${token}`
     const message = `<p>Welcom you.<p><br><p>Please click on the following <a href="${link}">link-here</a> to verify your account.</p> 
     <br><p>If you did not request this, please ignore this email.</p>`
 
@@ -158,6 +159,24 @@ const sendEmailHandler = async (account, token) => {
     return await mail.sendEmail(transportConfig, mailOptions)
 }
 
+const verifyAccountHandler = async (id, token) => {
+    // if (!token) {
+    //     throw new Error('Not have token!', 401)
+    // }
+
+    const identityData = tokenProvider.verify(token)
+
+    if (!identityData.id && identityData.id !== id) {
+        throw new Error('Invalid token!', 401)
+    }
+
+    return await AccountModel.findOneAndUpdate(
+        { _id: id },
+        { emailVerified: true },
+        { new: true }
+    )
+}
+
 const loginHandler = async (email, password) => {
     const existedAccount = await AccountModel.findOne({ email })
 
@@ -180,5 +199,6 @@ module.exports = {
     deleteAccountHandler,
     signUpHandler,
     sendEmailHandler,
+    verifyAccountHandler,
     loginHandler,
 }
