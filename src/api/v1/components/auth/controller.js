@@ -120,10 +120,6 @@ const signUp = async (req, res, next) => {
         success: 1,
         data: {
             _id: newAccount._id,
-            role: newAccount.role,
-            email: newAccount.email,
-            email_verfied: newAccount.emailVerified,
-            phone_verified: newAccount.phoneVerified,
             token: token,
         },
         message: 'An Email sent to your account please verify!',

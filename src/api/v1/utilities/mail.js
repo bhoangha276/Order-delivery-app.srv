@@ -1,4 +1,34 @@
+const MailGen = require('mailgen')
 const nodemailer = require('nodemailer')
+
+const emailTemplate = async (verifiLink) => {
+    const email = {
+        body: {
+            name: 'Ha Hoang', // name user signup
+            intro: 'Welcome to email verification',
+            action: {
+                instructions:
+                    'Please click the button below to verify your account',
+                button: {
+                    color: '#33b5e5',
+                    text: 'Verify account',
+                    link: verifiLink,
+                },
+            },
+        },
+    }
+
+    const mailGenerator = await new MailGen({
+        theme: 'salted',
+        product: {
+            name: 'Order & delivery app',
+            link: `http://127.0.0.1:8000/`, // url web app
+            // logo: your app logo url
+        },
+    })
+
+    return await mailGenerator.generate(email)
+}
 
 const sendEmail = async (transportConfig, mailOptions) => {
     try {
@@ -17,5 +47,6 @@ const sendEmail = async (transportConfig, mailOptions) => {
 }
 
 module.exports = {
+    emailTemplate,
     sendEmail,
 }

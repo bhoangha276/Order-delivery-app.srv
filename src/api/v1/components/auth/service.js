@@ -114,8 +114,7 @@ const sendEmailHandler = async (account, token) => {
     const address = account.email
     const subject = 'Account Verification Token'
     const link = `${config.App.baseUrl}${config.App.port}${config.App.api}/auth/verify/${account._id}/${token}`
-    const message = `<p>Welcom you.<p><br><p>Please click on the following <a href="${link}">link-here</a> to verify your account.</p> 
-    <br><p>If you did not request this, please ignore this email.</p>`
+    const tempEmail = await mail.emailTemplate(link)
 
     const googleApiConfig = {
         clientId: config.GoogleApis.clientId,
@@ -127,42 +126,32 @@ const sendEmailHandler = async (account, token) => {
     const accessToken = await googleApis.accessToken(googleApiConfig)
 
     const transportConfig = {
-        // host: config.Email.host,
         service: config.Email.service,
-        // port: 587,
-        // secure: false, // true for 465, false for other ports
-        // logger: true,
-        // debug: true,
-        // secureConnection: false,
         auth: {
             type: 'OAuth2',
             user: config.Email.user,
-            // pass: config.Email.pass,
             clientId: googleApiConfig.clientId,
             clientSecret: googleApiConfig.clientSecret,
             refreshToken: googleApiConfig.refreshToken,
             accessToken: accessToken,
             expires: 1484314697598,
         },
-        // tls: {
-        //     rejectUnAuthorized: false,
-        // },
     }
 
     const mailOptions = {
         from: `ADMIN-ODM 📢 <${config.Email.user}>`,
         to: address,
         subject: subject,
-        html: message,
+        html: tempEmail,
     }
 
     return await mail.sendEmail(transportConfig, mailOptions)
 }
 
 const verifyAccountHandler = async (id, token) => {
-    // if (!token) {
-    //     throw new Error('Not have token!', 401)
-    // }
+    if (!token) {
+        throw new Error('Not have token!', 401)
+    }
 
     const identityData = tokenProvider.verify(token)
 
