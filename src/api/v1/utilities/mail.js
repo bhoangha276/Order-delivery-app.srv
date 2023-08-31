@@ -1,10 +1,10 @@
 const MailGen = require('mailgen')
 const nodemailer = require('nodemailer')
 
-const emailTemplate = async (verifiLink) => {
+const emailTemplate = async (username, verifiLink) => {
     const email = {
         body: {
-            name: 'Ha Hoang', // name user signup
+            name: username, // name user signup
             intro: 'Welcome to email verification',
             action: {
                 instructions:
