@@ -111,11 +111,11 @@ const signUpHandler = async (userID, email, password) => {
     })
 }
 
-const sendEmailHandler = async (account, token) => {
+const sendEmailHandler = async (username, account, token) => {
     const address = account.email
     const subject = 'Account Verification Token'
     const link = `${config.App.baseUrl}${config.App.port}${config.App.api}/auth/verify/${account._id}/${token}`
-    const tempEmail = await mail.emailTemplate(link)
+    const tempEmail = await mail.emailTemplate(username, link)
 
     // const googleApiConfig = {
     //     clientId: config.GoogleApis.clientId,

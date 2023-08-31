@@ -109,6 +109,7 @@ const signUp = async (req, res, next) => {
 
     const newUser = await UserHandler.createUserHandler({ name })
     const userID = await newUser._id
+    const username = await newUser.name
 
     const newAccount = await AccountHandler.signUpHandler(
         userID,
@@ -119,7 +120,11 @@ const signUp = async (req, res, next) => {
     const token = await tokenProvider.sign(newAccount._id, newAccount.role)
 
     // Send email to verify
-    const result = await AccountHandler.sendEmailHandler(newAccount, token)
+    const result = await AccountHandler.sendEmailHandler(
+        username,
+        newAccount,
+        token
+    )
     console.log(result)
 
     res.send({
