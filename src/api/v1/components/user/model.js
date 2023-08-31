@@ -11,7 +11,7 @@ const UserSchema = new mongoose.Schema(
             trim: true,
             minLength: [10, 'Wrong phone number!'],
             maxLength: [11, 'Wrong phone number!'],
-            required: true,
+            // required: true,
         },
         photo: { type: String, trim: true },
     },

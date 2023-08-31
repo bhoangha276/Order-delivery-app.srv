@@ -59,13 +59,11 @@ const getAccount = async (req, res) => {
 const createAccount = async (req, res) => {
     const newAccountData = req.body
 
-    const updatedAccount = await AccountHandler.createAccountHandler(
-        newAccountData
-    )
+    const newAccount = await AccountHandler.createAccountHandler(newAccountData)
 
     res.send({
         success: 1,
-        id: updatedAccount._id,
+        id: newAccount._id,
     })
 }
 

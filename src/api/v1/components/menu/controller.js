@@ -58,11 +58,11 @@ const getMenu = async (req, res) => {
 const createMenu = async (req, res) => {
     const newMenuData = req.body
 
-    const updatedMenu = await MenuHandler.createMenuHandler(newMenuData)
+    const newMenu = await MenuHandler.createMenuHandler(newMenuData)
 
     res.send({
         success: 1,
-        id: updatedMenu._id,
+        id: newMenu._id,
     })
 }
 
