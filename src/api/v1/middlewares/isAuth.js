@@ -3,7 +3,7 @@ const AccountModel = require('../components/auth/account')
 const HttpError = require('../utilities/httpError')
 
 const isAuth = async (req, res, next) => {
-    const token = req.headers.authorization
+    const token = req.headers.authorization.split('Bearer')[1].trim()
 
     if (!token) {
         throw new HttpError('Not have token!', 401)

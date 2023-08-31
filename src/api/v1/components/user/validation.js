@@ -5,7 +5,7 @@ const createSchema = Joi.object({
     address: Joi.array(),
     gender: Joi.string().valid('male', 'female'),
     birthday: Joi.date().format(['YYYY/MM/DD', 'DD-MM-YYYY']).utc(),
-    phone: Joi.string().min(10).max(11).required(),
+    phone: Joi.string().min(10).max(11),
     photo: Joi.string(),
 })
 

@@ -58,11 +58,11 @@ const getTable = async (req, res) => {
 const createTable = async (req, res) => {
     const newTableData = req.body
 
-    const updatedTable = await TableHandler.createTableHandler(newTableData)
+    const newTable = await TableHandler.createTableHandler(newTableData)
 
     res.send({
         success: 1,
-        id: updatedTable._id,
+        id: newTable._id,
     })
 }
 

@@ -58,11 +58,11 @@ const getOrder = async (req, res) => {
 const createOrder = async (req, res) => {
     const newOrderData = req.body
 
-    const updatedOrder = await OrderHandler.createOrderHandler(newOrderData)
+    const newOrder = await OrderHandler.createOrderHandler(newOrderData)
 
     res.send({
         success: 1,
-        id: updatedOrder._id,
+        id: newOrder._id,
     })
 }
 

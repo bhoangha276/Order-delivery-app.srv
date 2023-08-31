@@ -60,13 +60,13 @@ const getEmployee = async (req, res) => {
 const createEmployee = async (req, res) => {
     const newEmployeeData = req.body
 
-    const updatedEmployee = await EmployeeHandler.createEmployeeHandler(
+    const newEmployee = await EmployeeHandler.createEmployeeHandler(
         newEmployeeData
     )
 
     res.send({
         success: 1,
-        id: updatedEmployee._id,
+        id: newEmployee._id,
     })
 }
 

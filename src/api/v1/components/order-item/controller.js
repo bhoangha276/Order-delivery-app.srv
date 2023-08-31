@@ -45,13 +45,13 @@ const getOrderItem = async (req, res) => {
 const createOrderItem = async (req, res) => {
     const newOrderItemData = req.body
 
-    const updatedOrderItem = await OrderItemHandler.createOrderIHandler(
+    const newOrderItem = await OrderItemHandler.createOrderIHandler(
         newOrderItemData
     )
 
     res.send({
         success: 1,
-        id: updatedOrderItem._id,
+        id: newOrderItem._id,
     })
 }
 

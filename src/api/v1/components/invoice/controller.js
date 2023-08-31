@@ -57,13 +57,11 @@ const getInvoice = async (req, res) => {
 const createInvoice = async (req, res) => {
     const newInvoiceData = req.body
 
-    const updatedInvoice = await InvoiceHandler.createInvoiceHandler(
-        newInvoiceData
-    )
+    const newInvoice = await InvoiceHandler.createInvoiceHandler(newInvoiceData)
 
     res.send({
         success: 1,
-        id: updatedInvoice._id,
+        id: newInvoice._id,
     })
 }
 

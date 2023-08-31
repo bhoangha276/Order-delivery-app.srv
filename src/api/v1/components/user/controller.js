@@ -58,11 +58,11 @@ const getUser = async (req, res) => {
 const createUser = async (req, res) => {
     const newUserData = req.body
 
-    const updatedUser = await UserHandler.createUserHandler(newUserData)
+    const newUser = await UserHandler.createUserHandler(newUserData)
 
     res.send({
         success: 1,
-        id: updatedUser._id,
+        id: newUser._id,
     })
 }
 

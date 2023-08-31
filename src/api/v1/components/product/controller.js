@@ -58,13 +58,11 @@ const getProduct = async (req, res) => {
 const createProduct = async (req, res) => {
     const newProductData = req.body
 
-    const updatedProduct = await ProductHandler.createProductHandler(
-        newProductData
-    )
+    const newProduct = await ProductHandler.createProductHandler(newProductData)
 
     res.send({
         success: 1,
-        id: updatedProduct._id,
+        id: newProduct._id,
     })
 }
 
