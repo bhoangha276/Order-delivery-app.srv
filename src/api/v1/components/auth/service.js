@@ -4,7 +4,7 @@ const mongoose = require('mongoose')
 
 const config = require('../../config')
 const mail = require('../../utilities/mail')
-const googleApis = require('../../utilities/googleApis')
+// const googleApis = require('../../utilities/googleApis')
 const tokenProvider = require('../../utilities/tokenProvider')
 
 const filterAccountHandler = async (keyword) => {
@@ -95,7 +95,7 @@ const deleteAccountHandler = async (id) => {
     })
 }
 
-const signUpHandler = async (email, password) => {
+const signUpHandler = async (userID, email, password) => {
     const existedAccount = await AccountModel.findOne({ email })
     if (existedAccount) {
         throw new Error('This email address is already used!', 400)
@@ -105,6 +105,7 @@ const signUpHandler = async (email, password) => {
     const hashPassword = await bcrypt.hash(password, 10)
 
     return await AccountModel.create({
+        userID,
         email,
         password: hashPassword,
     })
@@ -116,26 +117,34 @@ const sendEmailHandler = async (account, token) => {
     const link = `${config.App.baseUrl}${config.App.port}${config.App.api}/auth/verify/${account._id}/${token}`
     const tempEmail = await mail.emailTemplate(link)
 
-    const googleApiConfig = {
-        clientId: config.GoogleApis.clientId,
-        clientSecret: config.GoogleApis.clientSecret,
-        redirectUri: config.GoogleApis.redirectUri,
-        refreshToken: config.GoogleApis.refreshToken,
-    }
+    // const googleApiConfig = {
+    //     clientId: config.GoogleApis.clientId,
+    //     clientSecret: config.GoogleApis.clientSecret,
+    //     redirectUri: config.GoogleApis.redirectUri,
+    //     refreshToken: config.GoogleApis.refreshToken,
+    // }
 
-    const accessToken = await googleApis.accessToken(googleApiConfig)
+    // const accessToken = await googleApis.accessToken(googleApiConfig)
 
     const transportConfig = {
+        host: config.Email.host,
         service: config.Email.service,
+        port: 587,
+        secure: true,
         auth: {
-            type: 'OAuth2',
             user: config.Email.user,
-            clientId: googleApiConfig.clientId,
-            clientSecret: googleApiConfig.clientSecret,
-            refreshToken: googleApiConfig.refreshToken,
-            accessToken: accessToken,
-            expires: 1484314697598,
+            pass: config.Email.pass,
         },
+        // service: config.Email.service,
+        // auth: {
+        //     type: 'OAuth2',
+        //     user: config.Email.user,
+        //     clientId: googleApiConfig.clientId,
+        //     clientSecret: googleApiConfig.clientSecret,
+        //     refreshToken: googleApiConfig.refreshToken,
+        //     accessToken: accessToken,
+        //     expires: 1484314697598,
+        // },
     }
 
     const mailOptions = {

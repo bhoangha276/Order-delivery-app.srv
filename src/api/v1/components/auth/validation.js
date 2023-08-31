@@ -22,6 +22,7 @@ const updateSchema = Joi.object({
 
 // Default is user
 const signupSchema = Joi.object({
+    name: Joi.string().max(100).required(),
     email: Joi.string()
         .email({ minDomainSegments: 2, tlds: { allow: ['com', 'net'] } })
         .required(),

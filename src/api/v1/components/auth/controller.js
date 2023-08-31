@@ -1,4 +1,5 @@
 const AccountHandler = require('./service')
+const UserHandler = require('../user/service')
 const tokenProvider = require('../../utilities/tokenProvider')
 const HttpError = require('../../utilities/httpError')
 
@@ -104,9 +105,16 @@ const deleteAccount = async (req, res) => {
 
 //SIGN UP
 const signUp = async (req, res, next) => {
-    const { email, password } = req.body
+    const { name, email, password } = req.body
 
-    const newAccount = await AccountHandler.signUpHandler(email, password)
+    const newUser = await UserHandler.createUserHandler({ name })
+    const userID = await newUser._id
+
+    const newAccount = await AccountHandler.signUpHandler(
+        userID,
+        email,
+        password
+    )
 
     const token = await tokenProvider.sign(newAccount._id, newAccount.role)
 
@@ -118,6 +126,7 @@ const signUp = async (req, res, next) => {
         success: 1,
         data: {
             _id: newAccount._id,
+            userID: userID,
             token: token,
         },
         message: 'An Email sent to your account please verify!',
