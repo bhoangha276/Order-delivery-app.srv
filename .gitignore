@@ -1,13 +1,8 @@
 .idea
 .vscode
-.prettierrc
 .env
 
 node_modules/
 uploads/
 
 package-lock.json
-
-intents.json
-data.pth
-__pycache__/
