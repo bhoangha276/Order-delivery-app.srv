@@ -5,6 +5,9 @@ const createSchema = Joi.object({
     name: Joi.string().max(100).required(),
     price: Joi.number(),
     imageUrl: Joi.string().required(),
+    tags: Joi.array(),
+    origins: Joi.array(),
+    cookTime: Joi.string(),
 })
 
 // Remove 'required() of fields'
@@ -13,6 +16,9 @@ const updateSchema = Joi.object({
     name: Joi.string().max(100),
     price: Joi.number(),
     imageUrl: Joi.string(),
+    tags: Joi.array(),
+    origins: Joi.array(),
+    cookTime: Joi.string(),
 })
 
 module.exports = {

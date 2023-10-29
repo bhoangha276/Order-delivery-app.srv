@@ -1,12 +1,19 @@
 const ProductModel = require('./model')
 const mongoose = require('mongoose')
 
-const filterProductHandler = async (keyword) => {
-    const filter = keyword
-        ? {
-              $or: [{ name: { $regex: new RegExp(`${keyword}`, 'i') } }],
-          }
-        : {}
+const filterProductHandler = async (name, tag) => {
+    let filter = {}
+    if (name) {
+        filter = {
+            $or: [{ name: { $regex: new RegExp(`${name}`, 'i') } }],
+        }
+    }
+
+    if (tag) {
+        filter = {
+            $or: [{ tags: { $regex: new RegExp(`${tag}`, 'i') } }],
+        }
+    }
 
     const filters = {
         ...filter,

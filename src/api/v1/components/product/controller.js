@@ -3,9 +3,13 @@ const HttpError = require('../../utilities/httpError')
 
 // FILTER
 const filterProduct = async (req, res) => {
-    const { keyword } = req.query
+    const name = req.query.name ? req.query.name : ''
+    const tag = req.query.tag ? req.query.tag : ''
 
-    const [products, total] = await ProductHandler.filterProductHandler(keyword)
+    const [products, total] = await ProductHandler.filterProductHandler(
+        name,
+        tag
+    )
 
     res.send({
         success: 1,
