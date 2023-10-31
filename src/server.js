@@ -7,12 +7,16 @@ const app = require('./api/v1/app')
 async function main() {
     await mongoDB.connect(config.App.mongoUri, config.App.connectOptions)
 
-    const server = app.listen(config.App.port, (err) => {
-        if (err) throw err
-        console.log(
-            `Order-delivery-management server is running ${config.App.baseUrl}${config.App.port}`
-        )
-    })
+    const server = app.listen(
+        config.App.port,
+        config.App.baseUrlNetwork || config.App.baseUrlLocal,
+        (err) => {
+            if (err) throw err
+            console.log(
+                `Order-delivery-management server is running on port: ${config.App.port}`
+            )
+        }
+    )
 
     process.on('unhandledRejection', (err) => {
         console.log('UNHANDLED REJECTION!!!\nShutting down ...')
