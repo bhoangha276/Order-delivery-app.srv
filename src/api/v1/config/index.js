@@ -1,7 +1,8 @@
 require('dotenv').config()
 
 const App = {
-    baseUrl: process.env.BASE_URL,
+    baseUrlNetwork: process.env.BASE_URL_NETWORK,
+    baseUrlLocal: process.env.BASE_URL_LOCAL,
     api: process.env.API_URL,
     port: process.env.PORT || 8000,
 
