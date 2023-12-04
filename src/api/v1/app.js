@@ -30,16 +30,17 @@ app.get('/', (req, res) => {
 
 app.use(express.static('public'))
 app.use(`/uploads`, express.static('uploads'))
-app.use(`${api}/auth`, AuthRoute)
-app.use(`${api}/user`, UserRoute)
-app.use(`${api}/product`, ProductRoute)
-app.use(`${api}/employee`, EmployeeRoute)
-app.use(`${api}/order`, OrderRoute)
-app.use(`${api}/order-item`, OrderItemRoute)
-app.use(`${api}/invoice`, InvoiceRoute)
-// app.use(`${api}/table`, TableRoute)
-// app.use(`${api}/menu`, MenuRoute)
+
 app.use(`${api}/upload`, UploadRouter)
+app.use(`${api}/auth`, AuthRoute)
+app.use(`${api}/users`, UserRoute)
+app.use(`${api}/products`, ProductRoute)
+app.use(`${api}/employees`, EmployeeRoute)
+app.use(`${api}/orders`, OrderRoute)
+app.use(`${api}/order-items`, OrderItemRoute)
+app.use(`${api}/invoices`, InvoiceRoute)
+// app.use(`${api}/tables`, TableRoute)
+// app.use(`${api}/menus`, MenuRoute)
 
 app.use(errorHandler)
 
