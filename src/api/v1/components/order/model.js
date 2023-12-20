@@ -20,7 +20,7 @@ const OrderSchema = new mongoose.Schema(
         orderCode: { type: String, trim: true },
         address: { type: String, trim: true, default: '' },
         dateTime: { type: Date },
-        status: { type: Boolean, default: 1 },
+        status: { type: Number, default: 0 },
     },
     { timestamps: true }
 )
