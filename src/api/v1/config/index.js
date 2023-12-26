@@ -1,8 +1,11 @@
 require('dotenv').config()
 
 const App = {
-    networkhost: process.env.NETWORK_HOST,
-    localhost: process.env.LOCAL_HOST,
+    userClient: process.env.USER_CLIENT,
+
+    publicHost: process.env.PUBLIC_HOST,
+    networkHost: process.env.NETWORK_HOST,
+    localHost: process.env.LOCAL_HOST,
     api: process.env.API_URL,
     port: process.env.PORT || 8000,
 

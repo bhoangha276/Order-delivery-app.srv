@@ -3,6 +3,8 @@ const UserHandler = require('../user/service')
 const tokenProvider = require('../../utilities/tokenProvider')
 const HttpError = require('../../utilities/httpError')
 
+const config = require('../../config')
+
 // FILTER
 const filterAccount = async (req, res) => {
     const { keyword } = req.query
@@ -125,7 +127,7 @@ const signUp = async (req, res, next) => {
         newAccount,
         token
     )
-    console.log(result)
+    // console.log(result)
 
     res.send({
         success: 1,
@@ -182,10 +184,12 @@ const verifyAccount = async (req, res) => {
         throw new HttpError('Not found account!', 404)
     }
 
-    res.send({
-        success: 1,
-        message: 'Email verified sucessfully',
-    })
+    // res.send({
+    //     success: 1,
+    //     message: 'Email verified sucessfully',
+    // })
+
+    res.redirect(config.App.userClient)
 }
 
 const getAccountInfo = async (req, res) => {

@@ -114,7 +114,17 @@ const signUpHandler = async (userID, email, password) => {
 const sendEmailHandler = async (username, account, token) => {
     const address = account.email
     const subject = 'Account Verification Token'
-    const link = `${config.App.baseUrl}${config.App.port}${config.App.api}/auth/verify/${account._id}/${token}`
+
+    let PUBLIC_HOST = config.App.publicHost
+    let PORT = config.App.port
+    let HOST = config.App.networkHost || config.App.localHost
+    let link = ``
+
+    if (PUBLIC_HOST) {
+        link = `${PUBLIC_HOST}${config.App.api}/auth/verify/${account._id}/${token}`
+    } else
+        link = `http://${HOST}:${PORT}${config.App.api}/auth/verify/${account._id}/${token}`
+
     const tempEmail = await mail.emailTemplate(username, link)
 
     // const googleApiConfig = {
