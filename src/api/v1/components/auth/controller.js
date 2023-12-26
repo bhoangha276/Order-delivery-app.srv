@@ -184,12 +184,10 @@ const verifyAccount = async (req, res) => {
         throw new HttpError('Not found account!', 404)
     }
 
-    // res.send({
-    //     success: 1,
-    //     message: 'Email verified sucessfully',
-    // })
-
-    res.redirect(config.App.userClient)
+    res.send({
+        success: 1,
+        message: 'Email verified sucessfully!',
+    })
 }
 
 const getAccountInfo = async (req, res) => {
