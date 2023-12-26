@@ -127,15 +127,6 @@ const sendEmailHandler = async (username, account, token) => {
 
     const tempEmail = await mail.emailTemplate(username, link)
 
-    // const googleApiConfig = {
-    //     clientId: config.GoogleApis.clientId,
-    //     clientSecret: config.GoogleApis.clientSecret,
-    //     redirectUri: config.GoogleApis.redirectUri,
-    //     refreshToken: config.GoogleApis.refreshToken,
-    // }
-
-    // const accessToken = await googleApis.accessToken(googleApiConfig)
-
     const transportConfig = {
         host: config.Email.host,
         service: config.Email.service,
@@ -145,16 +136,6 @@ const sendEmailHandler = async (username, account, token) => {
             user: config.Email.user,
             pass: config.Email.pass,
         },
-        // service: config.Email.service,
-        // auth: {
-        //     type: 'OAuth2',
-        //     user: config.Email.user,
-        //     clientId: googleApiConfig.clientId,
-        //     clientSecret: googleApiConfig.clientSecret,
-        //     refreshToken: googleApiConfig.refreshToken,
-        //     accessToken: accessToken,
-        //     expires: 1484314697598,
-        // },
     }
 
     const mailOptions = {
