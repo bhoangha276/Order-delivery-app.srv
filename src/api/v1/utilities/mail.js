@@ -1,6 +1,10 @@
 const MailGen = require('mailgen')
 const nodemailer = require('nodemailer')
 
+const config = require('../config')
+
+let PRODUCT_LINK = config.App.userClient
+
 const emailTemplate = async (username, verifiLink) => {
     const email = {
         body: {
@@ -22,7 +26,7 @@ const emailTemplate = async (username, verifiLink) => {
         theme: 'salted',
         product: {
             name: 'Order & delivery app',
-            link: `http://127.0.0.1:8000/`, // url web app
+            link: PRODUCT_LINK, // url web app
             // logo: your app logo url
         },
     })

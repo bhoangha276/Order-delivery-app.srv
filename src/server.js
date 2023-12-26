@@ -5,7 +5,7 @@ const mongoDB = require('../db')
 const app = require('./api/v1/app')
 
 let PORT = config.App.port
-let HOST = config.App.networkhost || config.App.localhost
+let HOST = config.App.networkHost || config.App.localHost
 
 async function main() {
     await mongoDB.connect(config.App.mongoUri, config.App.connectOptions)
