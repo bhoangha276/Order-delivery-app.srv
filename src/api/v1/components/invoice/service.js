@@ -65,6 +65,30 @@ const getInvoiceHandler = async (id) => {
     return null
 }
 
+const getRevenueHandler = async (year, month) => {
+    const match = {
+        $match: {
+            createdAt: {
+                $gte: new Date(`${year}-01-01`),
+                $lte: new Date(`${year}-12-31`),
+            },
+        },
+    }
+
+    const group = {
+        $group: {
+            _id: {
+                year: { $year: '$createdAt' },
+                month: month === 'true' ? { $month: '$createdAt' } : null,
+            },
+            totalCost: { $sum: '$cost' },
+            quantity: { $sum: 1 },
+        },
+    }
+
+    return await InvoiceModel.aggregate([match, group])
+}
+
 const createInvoiceHandler = async (data) => {
     return await InvoiceModel.create({
         ...data,
@@ -87,6 +111,7 @@ module.exports = {
     filterInvoiceHandler,
     getAllInvoiceHandler,
     getInvoiceHandler,
+    getRevenueHandler,
     createInvoiceHandler,
     updateInvoiceHandler,
     deleteInvoiceHandler,

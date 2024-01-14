@@ -2,6 +2,7 @@ const router = require('express').Router()
 const invoiceController = require('./controller')
 
 router.get('/filter', invoiceController.filterInvoice)
+router.get('/revenue', invoiceController.getRevenue)
 router.get('/', invoiceController.getAllInvoices)
 router.get('/:id', invoiceController.getInvoice)
 router.post(

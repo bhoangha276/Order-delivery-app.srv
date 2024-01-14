@@ -10,7 +10,6 @@ const InvoiceSchema = new mongoose.Schema(
         cost: { type: Number },
         method: { type: String, required: true },
         status: { type: Boolean, default: 0 },
-        dueDate: { type: Date },
     },
     { timestamps: true }
 )
