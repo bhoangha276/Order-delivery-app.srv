@@ -1,4 +1,5 @@
 const OrderItemHandler = require('./service')
+const ProductHandler = require('../product/service')
 const HttpError = require('../../utilities/httpError')
 
 // GET ALL
@@ -38,6 +39,42 @@ const getOrderItem = async (req, res) => {
     res.send({
         success: 1,
         data: foundOrderItem,
+    })
+}
+
+//
+const getBestProducts = async (req, res) => {
+    const { year, month } = req.query
+
+    const getBestProduct = await OrderItemHandler.getBestProductsHandler(
+        year,
+        month
+    )
+
+    if (!getBestProduct) {
+        throw new HttpError('Error get best products!', 404)
+    }
+
+    // const updatedData = await getBestProduct.map(async (entry) => {
+    //     const productID = entry._id.productID
+
+    //     const result = await ProductHandler.getProductHandler(productID)
+    //     if (!result) {
+    //         throw new HttpError('Not found product!', 404)
+    //     }
+
+    //     return {
+    //         ...entry,
+    //         _id: {
+    //             // ...entry._id,
+    //             name: result.name,
+    //         },
+    //     }
+    // })
+
+    res.send({
+        success: 1,
+        data: getBestProduct,
     })
 }
 
@@ -93,6 +130,7 @@ const deleteOrderItem = async (req, res) => {
 module.exports = {
     getAllOrderItems,
     getOrderItem,
+    getBestProducts,
     createOrderItem,
     updateOrderItem,
     deleteOrderItem,

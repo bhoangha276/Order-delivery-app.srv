@@ -1,6 +1,7 @@
 const router = require('express').Router()
 const orderItemController = require('./controller')
 
+router.get('/best-product', orderItemController.getBestProducts)
 router.get('/', orderItemController.getAllOrderItems)
 router.get('/:orderItemID', orderItemController.getOrderItem)
 router.post(

@@ -48,6 +48,42 @@ const getOrderIHandler = async (id) => {
     return null
 }
 
+const getBestProductsHandler = async (year, month) => {
+    const match = {
+        $match: {
+            createdAt: {
+                $gte: new Date(`${year}-01-01`),
+                $lte: new Date(`${year}-12-31`),
+            },
+        },
+    }
+
+    const group = {
+        $group: {
+            _id: {
+                productID: '$productID',
+                name: '',
+                year: { $year: '$createdAt' },
+                month: month === 'true' ? { $month: '$createdAt' } : null,
+            },
+            totalQuantity: { $sum: '$quantity' },
+            totalPrice: { $sum: '$unitPrice' },
+        },
+    }
+
+    const sort = {
+        $sort: {
+            totalQuantity: -1,
+        },
+    }
+
+    const limit = {
+        $limit: 5,
+    }
+
+    return await OrderItemModel.aggregate([match, group, sort, limit])
+}
+
 const createOrderIHandler = async (data) => {
     return await OrderItemModel.create({
         ...data,
@@ -69,6 +105,7 @@ const deleteOrderIHandler = async (id) => {
 module.exports = {
     getAllOrderIHandler,
     getOrderIHandler,
+    getBestProductsHandler,
     createOrderIHandler,
     updateOrderIHandler,
     deleteOrderIHandler,
