@@ -53,6 +53,20 @@ const getInvoice = async (req, res) => {
     })
 }
 
+const getRevenue = async (req, res) => {
+    const { year, month } = req.query
+
+    const getRevenue = await InvoiceHandler.getRevenueHandler(year, month)
+    if (!getRevenue) {
+        throw new HttpError('Error get revenue!', 404)
+    }
+
+    res.send({
+        success: 1,
+        data: getRevenue,
+    })
+}
+
 // CREATE
 const createInvoice = async (req, res) => {
     const newInvoiceData = req.body
@@ -104,6 +118,7 @@ module.exports = {
     filterInvoice,
     getAllInvoices,
     getInvoice,
+    getRevenue,
     createInvoice,
     updateInvoice,
     deleteInvoice,
