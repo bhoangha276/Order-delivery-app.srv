@@ -86,7 +86,13 @@ const getRevenueHandler = async (year, month) => {
         },
     }
 
-    return await InvoiceModel.aggregate([match, group])
+    const sort = {
+        $sort: {
+            '_id.month': 1,
+        },
+    }
+
+    return await InvoiceModel.aggregate([match, group, sort])
 }
 
 const createInvoiceHandler = async (data) => {
