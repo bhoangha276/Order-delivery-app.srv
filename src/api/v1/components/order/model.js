@@ -2,15 +2,14 @@ const mongoose = require('mongoose')
 
 const OrderSchema = new mongoose.Schema(
     {
-        employeeID: {
-            type: mongoose.Types.ObjectId,
-            ref: 'Employee',
-            required: true,
-        },
         userID: {
             type: mongoose.Types.ObjectId,
             ref: 'User',
             required: true,
+        },
+        employeeID: {
+            type: mongoose.Types.ObjectId,
+            ref: 'Employee',
         },
         tableID: {
             type: mongoose.Types.ObjectId,
